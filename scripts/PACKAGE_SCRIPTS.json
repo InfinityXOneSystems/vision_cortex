@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "sync:gcs:push": "pwsh -File scripts/sync-gcs-bucket.ps1 -Direction push -Compress",
+    "sync:gcs:pull": "pwsh -File scripts/sync-gcs-bucket.ps1 -Direction pull",
+    "sync:gcs:sync": "pwsh -File scripts/sync-gcs-bucket.ps1 -Direction sync -Prune",
+    "sync:gcs:prune": "pwsh -File scripts/sync-gcs-bucket.ps1 -Direction prune -MaxVersions 5 -PruneAgeDays 30",
+    "sync:gcs:usage": "pwsh -File scripts/sync-gcs-bucket.ps1 -Command usage",
+    "sync:tri:full": "pwsh -File scripts/sync-tri-directional.ps1 -SyncMode full -IncludeGCS $true",
+    "sync:tri:pull": "pwsh -File scripts/sync-tri-directional.ps1 -SyncMode pull -IncludeGCS $true",
+    "sync:tri:push": "pwsh -File scripts/sync-tri-directional.ps1 -SyncMode push -IncludeGCS $true",
+    "sync:tri:cron": "pwsh -File scripts/sync-tri-directional.ps1 -SyncMode cron -IncludeGCS $true",
+    "sync:secrets": "pwsh -File scripts/sync-secrets.ps1 -Direction sync",
+    "sync:secrets:push": "pwsh -File scripts/sync-secrets.ps1 -Direction push",
+    "sync:secrets:pull": "pwsh -File scripts/sync-secrets.ps1 -Direction pull"
+  }
+}
