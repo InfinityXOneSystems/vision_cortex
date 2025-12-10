@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FDA Approval Tracker - Real-time tracking of drug approvals, clinical trials, safety data
  * Target: 90% deal probability for pharmaceutical M&A
  *
@@ -118,7 +118,7 @@ export class FDAApprovalTracker extends EventEmitter {
     }
   }
 
-  private async trackAllEvents(): Promise<void> {
+  public async trackAllEvents(): Promise<void> {
     const trackers = [
       { name: "pdufa", fn: this.trackPDUFADates.bind(this) },
       { name: "clinical-trials", fn: this.trackClinicalTrials.bind(this) },
@@ -389,3 +389,4 @@ export class FDAApprovalTracker extends EventEmitter {
  * - Class 1 recall: 60% fire-sale acquisition probability
  * - Warning letter + production halt: 55% distressed acquisition probability
  */
+

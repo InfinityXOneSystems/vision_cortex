@@ -1,13 +1,13 @@
-/**
+﻿/**
  * Playbook Router - Decision tree execution and routing logic
  *
  * Routes scored signals to specialized playbooks based on:
  * - Signal type (foreclosure, PDUFA, talent exodus, etc.)
  * - Score threshold (high/medium/low)
- * - Trigger combination (urgency + financial stress → rescue vs buy)
+ * - Trigger combination (urgency + financial stress â†’ rescue vs buy)
  *
  * Playbooks: buy, partner, refinance, rescue, litigate, walk
- * Each playbook has decision tree: if data missing → fetch; if score low → switch play
+ * Each playbook has decision tree: if data missing â†’ fetch; if score low â†’ switch play
  */
 
 import { EventEmitter } from "events";
@@ -427,7 +427,7 @@ export class PlaybookRouter extends EventEmitter {
       actions,
       estimatedTimeline: "Immediate",
       successProbability: 0,
-      fallbackPlaybook: undefined,
+      fallbackPlaybook: signal.playbook || "",
     };
   }
 
@@ -463,3 +463,5 @@ export class PlaybookRouter extends EventEmitter {
     };
   }
 }
+
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Court Docket Crawler - Real-time tracking of foreclosure, probate, eviction, divorce proceedings
  * Target: +40% closing rate impact via urgency-based targeting
  *
@@ -142,7 +142,7 @@ export class CourtDocketCrawler extends EventEmitter {
   /**
    * Crawl all configured court data sources
    */
-  private async crawlAllSources(): Promise<void> {
+  public async crawlAllSources(): Promise<void> {
     const sources = [
       { name: "foreclosure", fn: this.crawlForeclosureCases.bind(this) },
       { name: "probate", fn: this.crawlProbateCases.bind(this) },
@@ -405,3 +405,5 @@ export class CourtDocketCrawler extends EventEmitter {
  * - Asset division ordered: 68% conversion
  * - Contested property: 72% conversion
  */
+
+

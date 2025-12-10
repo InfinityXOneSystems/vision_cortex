@@ -1,4 +1,4 @@
-/**
+﻿/**
  * P1.4: REDIS EVENT BUS - DECOUPLE ORCHESTRATOR
  *
  * Replaces direct HTTP calls with asynchronous event-driven architecture
@@ -12,8 +12,10 @@ import { createLogger } from "./centralized-logger";
 const logger = createLogger("redis-event-bus");
 
 export interface EventBusConfig {
-  redis_url: string;
-  service_name: string;
+  redis_url?: string;
+  host?: string;
+  port?: number;
+  service_name?: string;
 }
 
 export interface SystemEvent {
@@ -34,17 +36,19 @@ export class RedisEventBus extends EventEmitter {
   private serviceName: string;
   private subscriptions: Map<string, (event: SystemEvent) => void> = new Map();
 
-  constructor(config: EventBusConfig) {
+    constructor(config?: EventBusConfig) {
     super();
-    this.serviceName = config.service_name;
+    const redisUrl = config?.redis_url || process.env.REDIS_URL || 'redis://localhost:6379';
+    const serviceName = config?.service_name || process.env.SERVICE_NAME || 'vision_cortex';
+    this.serviceName = serviceName;
 
     // Create separate Redis clients for pub/sub
-    this.publisher = new Redis(config.redis_url, {
+    this.publisher = new Redis(redisUrl, {
       lazyConnect: true,
       maxRetriesPerRequest: 3,
     });
 
-    this.subscriber = new Redis(config.redis_url, {
+    this.subscriber = new Redis(redisUrl, {
       lazyConnect: true,
       maxRetriesPerRequest: 3,
     });
@@ -170,6 +174,7 @@ export class RedisEventBus extends EventEmitter {
  * Event channel constants
  */
 export const EventChannels = {
+  SIGNAL_INGESTED: 'signal:ingested',
   // OSINT Events
   OSINT_CRAWL_COMPLETE: "osint:crawl-complete",
   OSINT_NEW_DOCUMENT: "osint:new-document",
@@ -233,3 +238,7 @@ export interface EventPayloads {
     errors: Array<{ path: string[]; message: string }>;
   };
 }
+
+
+
+

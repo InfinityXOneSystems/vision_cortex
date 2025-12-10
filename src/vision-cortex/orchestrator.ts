@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Vision Cortex Orchestrator - Integrates all Vision Cortex components
  *
  * Wires together the complete intelligence pipeline:
@@ -130,9 +130,9 @@ export class VisionCortexOrchestrator extends EventEmitter {
    * Wire up event handlers for the complete pipeline
    */
   private wireEventHandlers(): void {
-    // 1. SIGNAL INGESTION → ENTITY RESOLUTION
+    // 1. SIGNAL INGESTION â†’ ENTITY RESOLUTION
     this.eventBus.subscribe(EventChannels.SIGNAL_INGESTED, (event) => {
-      const signal = event.data as Signal;
+      const signal = event.payload as Signal;
       const entity = this.entityResolver.resolveEntity(signal);
 
       this.emit("signal:resolved", {
@@ -144,7 +144,7 @@ export class VisionCortexOrchestrator extends EventEmitter {
       this.scoreSignal(signal);
     });
 
-    // 2. SIGNAL SCORED → ALERTS + PLAYBOOK
+    // 2. SIGNAL SCORED â†’ ALERTS + PLAYBOOK
     this.scoringEngine.on("signal:scored", (scoredData) => {
       const { signalId, score, priority } = scoredData;
 
@@ -158,7 +158,7 @@ export class VisionCortexOrchestrator extends EventEmitter {
       this.emit("signal:awaiting-playbook", { signalId, score, priority });
     });
 
-    // 3. ALERT TRIGGERED → OUTREACH
+    // 3. ALERT TRIGGERED â†’ OUTREACH
     this.alertSystem.on("alert:triggered", (alert) => {
       this.emit("alert:ready", alert);
 
@@ -169,12 +169,12 @@ export class VisionCortexOrchestrator extends EventEmitter {
       }
     });
 
-    // 4. PLAYBOOK ROUTED → EXECUTION
+    // 4. PLAYBOOK ROUTED â†’ EXECUTION
     this.playbookRouter.on("playbook:routed", (routeData) => {
       this.emit("playbook:executing", routeData);
     });
 
-    // 5. OUTREACH GENERATED → SEND
+    // 5. OUTREACH GENERATED â†’ SEND
     this.outreachGenerator.on("outreach:generated", (outreachData) => {
       this.emit("outreach:ready", outreachData);
       // TODO: Integrate with email/SMS/phone/LinkedIn APIs
@@ -343,3 +343,4 @@ export class VisionCortexOrchestrator extends EventEmitter {
  * const metrics = orchestrator.getMetrics();
  * console.log(metrics);
  */
+

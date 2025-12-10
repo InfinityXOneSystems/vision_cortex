@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Outreach Script Generator - 3-line templates with dynamic field insertion
  *
  * Template structure (from taxonomy):
  * Line 1: PROOF - "Your score dropped 80 points last month"
  * Line 2: PROBLEM - "Traditional banks won't approve"
- * Line 3: SOLUTION + DEADLINE - "We specialize in credit rebuilders—approved in 48 hours"
+ * Line 3: SOLUTION + DEADLINE - "We specialize in credit rebuildersâ€”approved in 48 hours"
  *
  * Generate variations for: email, SMS, phone script, LinkedIn InMail
  * A/B testing framework to optimize conversion rates
@@ -117,7 +117,7 @@ export class OutreachGenerator extends EventEmitter {
   private fillTemplate(
     template: OutreachTemplate,
     signal: ScoredSignal
-  ): { subject?: string; body: string } {
+  ): { subject: string; body: string } {
     const variables = this.extractVariables(signal);
 
     // Replace variables in template
@@ -130,7 +130,7 @@ export class OutreachGenerator extends EventEmitter {
       subject = subject.replace(new RegExp(placeholder, "g"), String(value));
     }
 
-    return { subject: subject || undefined, body };
+    return { subject: subject ?? "", body };
   }
 
   /**
@@ -228,7 +228,7 @@ export class OutreachGenerator extends EventEmitter {
         channel: "email",
         proof: "We noticed {{entityName}} is facing {{painPoint}}.",
         problem: "Most companies in {{industry}} struggle with this during critical windows.",
-        solution: "We specialize in {{solution}}—with proven results in {{location}}. Let's discuss {{deadline}}.",
+        solution: "We specialize in {{solution}}â€”with proven results in {{location}}. Let's discuss {{deadline}}.",
         subjectLine: "{{entityName}} - {{solution}}",
         callToAction: "Reply to this email or call me at [PHONE] to discuss.",
         variables: ["entityName", "painPoint", "industry", "solution", "location", "deadline"],
@@ -266,7 +266,7 @@ export class OutreachGenerator extends EventEmitter {
       },
     };
 
-    return templates[channel];
+    return (templates[channel] || templates.email) as OutreachTemplate;
   }
 
   /**
@@ -280,7 +280,7 @@ export class OutreachGenerator extends EventEmitter {
       channel: "email",
       proof: "I see {{entityName}} has a foreclosure auction scheduled {{deadline}}.",
       problem: "With the auction date approaching, traditional buyers won't have time to close.",
-      solution: "We specialize in pre-foreclosure purchases—all cash, no contingencies, close in 7 days. We've helped 200+ homeowners avoid foreclosure.",
+      solution: "We specialize in pre-foreclosure purchasesâ€”all cash, no contingencies, close in 7 days. We've helped 200+ homeowners avoid foreclosure.",
       subjectLine: "{{entityName}} - Stop Foreclosure Before {{deadline}}",
       callToAction: "Call me at [PHONE] today. Time is critical.",
       variables: ["entityName", "deadline"],
@@ -291,7 +291,7 @@ export class OutreachGenerator extends EventEmitter {
       templateId: "pdufa-email",
       name: "PDUFA Email",
       channel: "email",
-      proof: "{{entityName}}'s PDUFA date is {{deadline}}—we're tracking this closely.",
+      proof: "{{entityName}}'s PDUFA date is {{deadline}}â€”we're tracking this closely.",
       problem: "With approval imminent, strategic acquirers are circling. The next 60 days determine your outcome.",
       solution: "We connect biotech companies with strategic partners pre-approval. Our clients average 2.3x valuation vs post-approval acquisitions.",
       subjectLine: "{{entityName}} - PDUFA Approval Strategy",
@@ -305,7 +305,7 @@ export class OutreachGenerator extends EventEmitter {
       name: "Talent Exodus Email",
       channel: "email",
       proof: "We noticed {{entityName}} recently had {{value}} executive departures.",
-      problem: "Talent exodus signals deeper issues—investors, customers, and competitors are watching.",
+      problem: "Talent exodus signals deeper issuesâ€”investors, customers, and competitors are watching.",
       solution: "We help companies stabilize during leadership transitions: interim executives, retention packages, strategic messaging. Act before the next departure.",
       subjectLine: "{{entityName}} - Leadership Transition Support",
       callToAction: "Can we schedule 30 minutes this week? Reply or call [PHONE].",
@@ -319,7 +319,7 @@ export class OutreachGenerator extends EventEmitter {
       channel: "email",
       proof: "{{entityName}} has a {{value}} lawsuit with statute of limitations {{deadline}}.",
       problem: "If you don't file by {{deadline}}, you lose the right to recover damages.",
-      solution: "We specialize in commercial litigation recovery—contingency basis, no upfront cost. We've recovered $500M+ for clients.",
+      solution: "We specialize in commercial litigation recoveryâ€”contingency basis, no upfront cost. We've recovered $500M+ for clients.",
       subjectLine: "{{entityName}} - Statute of Limitations {{deadline}}",
       callToAction: "Call [PHONE] immediately. Time is running out.",
       variables: ["entityName", "value", "deadline"],
@@ -330,7 +330,7 @@ export class OutreachGenerator extends EventEmitter {
       templateId: "refinance-email",
       name: "Refinance Email",
       channel: "email",
-      proof: "{{entityName}}'s debt matures {{deadline}}—current rates are unfavorable.",
+      proof: "{{entityName}}'s debt matures {{deadline}}â€”current rates are unfavorable.",
       problem: "With {{financialStress}}% debt-to-income, traditional lenders won't refinance.",
       solution: "We structure creative financing: extended terms, lower payments, bridge to permanent financing. No prepayment penalties.",
       subjectLine: "{{entityName}} - Refinance Before {{deadline}}",
@@ -403,3 +403,10 @@ export class OutreachGenerator extends EventEmitter {
     return metrics;
   }
 }
+
+
+
+
+
+
+

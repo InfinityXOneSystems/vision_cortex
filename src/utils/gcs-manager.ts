@@ -1,4 +1,4 @@
-import {
+﻿import {
   Storage,
   Bucket,
   File,
@@ -51,10 +51,7 @@ export class VisionCortexGCSManager extends EventEmitter {
       ...config,
     };
 
-    this.storage = new Storage({
-      projectId: this.config.projectId,
-      keyFilename: this.config.credentialsPath,
-    });
+    this.storage = new Storage(this.config as any);
 
     this.bucket = this.storage.bucket(this.config.bucketName);
   }
@@ -119,7 +116,7 @@ export class VisionCortexGCSManager extends EventEmitter {
       const gcsInfo = this.gcsManifest[relPath];
 
       // Skip if unchanged (hash match)
-      if (gcsInfo && gcsInfo.hash === localInfo.hash) {
+      if (gcsInfo && localInfo && gcsInfo.hash === localInfo.hash) {
         result.skipped++;
         this.emit("push:skipped", { file: relPath });
         continue;
@@ -134,12 +131,12 @@ export class VisionCortexGCSManager extends EventEmitter {
         // Compress large files
         if (data.length > (this.config.compressionThreshold || 1024 * 1024)) {
           const zlib = await import("zlib");
-          uploadData = await new Promise<Buffer>((resolve, reject) => {
+          uploadData = Buffer.from(await new Promise<any>((resolve, reject) => {
             zlib.gzip(data, (err, result) => {
               if (err) reject(err);
               else resolve(result);
             });
-          });
+          }));
           uploadName = `${relPath}.gz`;
           compressed = true;
         }
@@ -230,7 +227,7 @@ export class VisionCortexGCSManager extends EventEmitter {
         const metadata = await file.getMetadata();
         this.gcsManifest[file.name] = {
           hash: metadata[0].md5Hash || "",
-          size: parseInt(metadata[0].size || "0"),
+          size: parseInt(String(metadata[0].size || "0")),
           modified: new Date(metadata[0].updated || ""),
           compressed: file.name.endsWith(".gz"),
         };
@@ -269,7 +266,7 @@ export class VisionCortexGCSManager extends EventEmitter {
         });
 
         for (let i = this.config.maxVersions!; i < sorted.length; i++) {
-          const file = sorted[i];
+          const file = sorted[i]; if (!file) continue;
           const age = Math.floor(
             (Date.now() - new Date(file.metadata?.updated || 0).getTime()) /
               (1000 * 60 * 60 * 24)
@@ -278,7 +275,7 @@ export class VisionCortexGCSManager extends EventEmitter {
           if (age > this.config.pruneAgeDays!) {
             await file.delete();
             result.deleted++;
-            result.freed += parseInt(file.metadata?.size || "0");
+            result.freed += parseInt(String(file.metadata?.size || "0"));
             this.emit("prune:deleted", {
               file: file.name,
               age,
@@ -305,7 +302,7 @@ export class VisionCortexGCSManager extends EventEmitter {
       const topObjects: Array<{ name: string; size: number }> = [];
 
       for (const file of files) {
-        const size = parseInt(file.metadata?.size || "0");
+        const size = parseInt(String(file.metadata?.size || "0"));
         totalBytes += size;
         topObjects.push({ name: file.name, size });
       }
@@ -384,3 +381,12 @@ export class VisionCortexGCSManager extends EventEmitter {
     return result;
   }
 }
+
+
+
+
+
+
+
+
+

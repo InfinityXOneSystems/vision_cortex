@@ -1,11 +1,11 @@
-import { EventEmitter } from "events";
+﻿import { EventEmitter } from "events";
 import { RedisEventBus, EventChannels } from "../utils/redis-event-bus";
 import { CourtDocketCrawler } from "./crawlers/court-docket-crawler";
 import { FDAApprovalTracker } from "./crawlers/fda-approval-tracker";
 import { LinkedInTalentTracker } from "./crawlers/linkedin-talent-tracker";
 import { ScoringEngine, type Signal, type ScoredSignal } from "./scoring-engine";
 
-// Industries covered by the Vision Cortex taxonomy (10 industries × 10 niches)
+// Industries covered by the Vision Cortex taxonomy (10 industries Ã— 10 niches)
 type Industry =
   | "commercial_real_estate"
   | "healthcare_mna"
@@ -68,14 +68,14 @@ export class UniversalIngestor extends EventEmitter {
       healthcare_mna: {
         cadenceMinutes: defaultCadence,
         sources: [
-          { name: "fda-approvals", run: () => this.fdaTracker.track() },
+          { name: "fda-approvals", run: () => this.fdaTracker.trackAllEvents() },
           { name: "generic-healthcare-signals", run: () => this.generateGenericSignals("healthcare_mna") },
         ],
       },
       private_equity: {
         cadenceMinutes: defaultCadence,
         sources: [
-          { name: "talent-migration", run: () => this.linkedInTracker.trackTalentMovements() },
+          { name: "talent-migration", run: () => this.linkedInTracker.trackKOLMovements() },
           { name: "generic-pe-signals", run: () => this.generateGenericSignals("private_equity") },
         ],
       },
@@ -95,7 +95,7 @@ export class UniversalIngestor extends EventEmitter {
       corporate_mna: {
         cadenceMinutes: defaultCadence,
         sources: [
-          { name: "talent-migration", run: () => this.linkedInTracker.trackTalentMovements() },
+          { name: "talent-migration", run: () => this.linkedInTracker.trackKOLMovements() },
           { name: "generic-corp-mna", run: () => this.generateGenericSignals("corporate_mna") },
         ],
       },
@@ -116,7 +116,7 @@ export class UniversalIngestor extends EventEmitter {
       staffing: {
         cadenceMinutes: defaultCadence,
         sources: [
-          { name: "talent-migration", run: () => this.linkedInTracker.trackTalentMovements() },
+          { name: "talent-migration", run: () => this.linkedInTracker.trackKOLMovements() },
           { name: "generic-staffing", run: () => this.generateGenericSignals("staffing") },
         ],
       },
@@ -157,7 +157,7 @@ export class UniversalIngestor extends EventEmitter {
 
   /** Stop ingestion */
   stop(): void {
-    this.timers.forEach((t) => clearInterval(t));
+    this.timers.forEach((t) => clearInterval(t as any));
     this.timers = [];
     this.emit("universal:stopped");
   }
@@ -235,3 +235,5 @@ if (require.main === module) {
   const ingestor = new UniversalIngestor();
   void ingestor.initialize().then(() => ingestor.start());
 }
+
+

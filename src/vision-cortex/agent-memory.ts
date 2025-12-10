@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Agent Memory Service - Tracks agent conversations, embeddings, context matching
  * Enables agents to remember prior reasoning and build on consensus
  *
@@ -109,7 +109,7 @@ export class AgentMemory extends EventEmitter {
     const redisKey = `thought:${thought.thought_id}`;
     await this.redisClient.setex(
       redisKey,
-      thought.ttl_seconds || this.hotCacheTTL,
+      ( (thought as any).ttl_seconds ?? this.hotCacheTTL ),
       JSON.stringify(thought)
     );
 
@@ -323,3 +323,4 @@ if (require.main === module) {
     console.log("Agent Memory Service initialized");
   });
 }
+
