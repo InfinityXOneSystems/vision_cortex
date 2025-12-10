@@ -1,7 +1,9 @@
 # Cron Job Configuration for Vision Cortex GCS Bi-directional Sync
+
 # Run on schedule (Linux/macOS) or Task Scheduler (Windows)
 
 ## Linux/macOS Crontab Setup
+
 ```bash
 # Add to crontab: crontab -e
 
@@ -16,6 +18,7 @@
 ```
 
 ## Windows Task Scheduler Setup
+
 ```powershell
 # Run PowerShell as Administrator
 
@@ -57,12 +60,13 @@ Unregister-ScheduledTask -TaskName 'Vision-Cortex-GCS-Sync' -Confirm:$false
 ```
 
 ## GitHub Actions Workflow (for CI/CD)
+
 ```yaml
 name: Vision Cortex GCS Sync
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
+    - cron: "0 */6 * * *" # Every 6 hours
   workflow_dispatch:
 
 jobs:
@@ -70,28 +74,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: infinity-x-one-systems
           service_account_key: ${{ secrets.GCP_SA_KEY }}
-      
+
       - name: Sync to GCS
         run: |
           gsutil -m cp -r signals/ gs://vision-cortex-infinity-x-one/signals/
           gsutil -m cp -r docs/ gs://vision-cortex-infinity-x-one/docs/
-      
+
       - name: Prune old versions
         run: |
           gsutil versioning set on gs://vision-cortex-infinity-x-one
           # Cleanup script would run here
-      
+
       - name: Generate usage report
         run: |
           gsutil du -s gs://vision-cortex-infinity-x-one/ > usage-report.txt
           # Save as artifact
-      
+
       - uses: actions/upload-artifact@v3
         with:
           name: gcs-usage-report
@@ -99,6 +103,7 @@ jobs:
 ```
 
 ## Container-Based Cron (for Kubernetes/Docker)
+
 ```yaml
 # kubernetes-cron.yaml
 apiVersion: batch/v1
@@ -113,27 +118,27 @@ spec:
         spec:
           serviceAccountName: vision-cortex-sync
           containers:
-          - name: sync
-            image: gcr.io/infinity-x-one-systems/vision-cortex:latest
-            command:
-            - /bin/sh
-            - -c
-            - npx ts-node scripts/gcs-sync-cron.ts --direction sync --prune
-            env:
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              valueFrom:
-                secretKeyRef:
-                  name: gcp-credentials
-                  key: service-account.json
-            - name: GCS_BUCKET
-              value: vision-cortex-infinity-x-one
-            resources:
-              requests:
-                memory: "512Mi"
-                cpu: "250m"
-              limits:
-                memory: "1Gi"
-                cpu: "500m"
+            - name: sync
+              image: gcr.io/infinity-x-one-systems/vision-cortex:latest
+              command:
+                - /bin/sh
+                - -c
+                - npx ts-node scripts/gcs-sync-cron.ts --direction sync --prune
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  valueFrom:
+                    secretKeyRef:
+                      name: gcp-credentials
+                      key: service-account.json
+                - name: GCS_BUCKET
+                  value: vision-cortex-infinity-x-one
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "1Gi"
+                  cpu: "500m"
           restartPolicy: OnFailure
 ---
 apiVersion: v1
@@ -145,6 +150,7 @@ metadata:
 ## Monitoring & Alerting
 
 ### Prometheus Metrics Export
+
 ```typescript
 // Add to sync script
 const syncMetrics = {
@@ -157,17 +163,18 @@ const syncMetrics = {
 };
 
 // Export to Prometheus
-console.log('# HELP vision_cortex_gcs_pushed_files Total files pushed');
-console.log('# TYPE vision_cortex_gcs_pushed_files gauge');
+console.log("# HELP vision_cortex_gcs_pushed_files Total files pushed");
+console.log("# TYPE vision_cortex_gcs_pushed_files gauge");
 console.log(`vision_cortex_gcs_pushed_files ${syncMetrics.pushed_files}`);
 ```
 
 ### CloudWatch/Stackdriver Integration
+
 ```powershell
 # Log sync results to Google Cloud Logging
 function Log-ToCloudLogging {
   param([hashtable]$LogEntry)
-  
+
   $json = $LogEntry | ConvertTo-Json
   & gcloud logging write vision-cortex-sync "$json" `
     --severity=INFO `
@@ -178,6 +185,7 @@ function Log-ToCloudLogging {
 ## Monitoring Dashboard Queries
 
 ### Usage Growth Over Time
+
 ```sql
 SELECT DATE(timestamp) as date, SUM(total_bytes) as bytes
 FROM `vision-cortex-gcs-metrics`
@@ -187,6 +195,7 @@ LIMIT 30;
 ```
 
 ### Sync Success Rate
+
 ```sql
 SELECT COUNT(*) as total_syncs,
        SUM(CASE WHEN status='SUCCESS' THEN 1 ELSE 0 END) as successful,
@@ -217,15 +226,17 @@ WHERE timestamp >= TIMESTAMP_SUB(NOW(), INTERVAL 7 DAY);
 ## Troubleshooting
 
 ### Issues
-| Problem | Solution |
-|---------|----------|
-| `gcloud not found` | Install Google Cloud SDK: `https://cloud.google.com/sdk/docs/install` |
-| `Bucket not found` | Verify bucket name: `gcloud storage ls` |
-| `Permission denied` | Check service account IAM: `gcloud iam service-accounts list` |
-| `Sync too slow` | Use `--include` to limit file patterns: `--include='*.json'` |
-| `High costs` | Increase `MaxVersions`, decrease `PruneAgeDays`, enable `Compress` |
+
+| Problem             | Solution                                                              |
+| ------------------- | --------------------------------------------------------------------- |
+| `gcloud not found`  | Install Google Cloud SDK: `https://cloud.google.com/sdk/docs/install` |
+| `Bucket not found`  | Verify bucket name: `gcloud storage ls`                               |
+| `Permission denied` | Check service account IAM: `gcloud iam service-accounts list`         |
+| `Sync too slow`     | Use `--include` to limit file patterns: `--include='*.json'`          |
+| `High costs`        | Increase `MaxVersions`, decrease `PruneAgeDays`, enable `Compress`    |
 
 ### Debug Logs
+
 ```powershell
 # Enable verbose logging
 $VerbosePreference = 'Continue'

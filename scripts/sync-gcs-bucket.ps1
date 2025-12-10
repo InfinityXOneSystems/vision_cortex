@@ -73,7 +73,7 @@ function Test-GCloudSetup {
   try {
     $version = & gcloud --version 2>&1 | Select-Object -First 1
     Log "gcloud found: $version" 'INFO'
-    
+
     # Verify auth
     $auth = & gcloud auth list --filter=status:ACTIVE --format='value(account)' 2>&1
     if (-not $auth) {
@@ -100,7 +100,7 @@ function Get-FileHash256 {
 # Build sync manifest (track local hashes)
 function Build-LocalManifest {
   Log "Building local file manifest..." 'INFO'
-  
+
   $manifest = @{}
   $files = @()
 
@@ -143,7 +143,7 @@ function Get-GCSManifest {
   $manifest = @{}
   try {
     $objects = & gcloud storage ls -r "$BucketUrl/**" --format='json' 2>&1 | ConvertFrom-Json
-    
+
     foreach ($obj in $objects) {
       if ($obj.type -eq 'OBJECT') {
         $name = $obj.name -replace [regex]::Escape("$BucketUrl/"), ''
@@ -169,7 +169,7 @@ function Push-ToGCS {
 
   $localManifest = Build-LocalManifest
   $gcsManifest = Get-GCSManifest
-  
+
   $pushed = 0
   $skipped = 0
   $totalSize = 0
@@ -177,7 +177,7 @@ function Push-ToGCS {
   foreach ($relPath in $localManifest.Keys) {
     $localFile = "$LocalRepo\$relPath"
     $gcsPath = "$BucketUrl/$relPath"
-    
+
     $localInfo = $localManifest[$relPath]
     $gcsInfo = $gcsManifest[$relPath]
 
@@ -191,7 +191,7 @@ function Push-ToGCS {
     # Compress if requested
     $uploadFile = $localFile
     $uploadPath = $gcsPath
-    
+
     if ($Compress -and $localInfo.size -gt 1MB) {
       $gzipFile = "$localFile.gz"
       & gzip -k -f $localFile 2>&1 | Out-Null

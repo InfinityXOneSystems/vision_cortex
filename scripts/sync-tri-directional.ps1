@@ -28,6 +28,7 @@ param(
   [ValidateSet('full', 'pull', 'push', 'cron')]
   [string]$SyncMode = 'full',
 
+  [bool]$IncludeGCS = $true,
   [bool]$DryRun = $false,
   [bool]$Verbose = $false
 )
@@ -35,6 +36,7 @@ param(
 $LocalRepo = "C:\Users\JARVIS\OneDrive\Documents\Infinity_X_One_Systems\Vision_Cortex"
 $GitHubRepo = "https://github.com/InfinityXOneSystems/vision_cortex.git"
 $DriveFolder = "14Ry-eaPhuyliv7L02KviaYMHmucv1XoC"
+$GCSBucket = "vision-cortex-infinity-x-one"
 $GoogleServiceAccountPath = "$LocalRepo\.env.local"  # Contains GCP credentials
 
 $ErrorActionPreference = "Stop"
@@ -148,24 +150,73 @@ function Sync-ToGoogleDrive {
   return $true
 }
 
+# 5. SYNC with Google Cloud Storage (GCS)
+function Sync-WithGCS {
+  param([string]$Direction)
+
+  if (-not $IncludeGCS) {
+    Log "GCS sync disabled (--IncludeGCS \$false)"
+    return $true
+  }
+
+  Log "Syncing with GCS bucket ($GCSBucket)..."
+
+  try {
+    # Verify gcloud is available
+    $version = & gcloud --version 2>&1 | Select-Object -First 1
+    Log "  gcloud: $version" 'DEBUG'
+
+    # Run GCS sync script
+    $gcsScript = "$LocalRepo\scripts\sync-gcs-bucket.ps1"
+    if (-not (Test-Path $gcsScript)) {
+      Log "  ⚠ GCS sync script not found at $gcsScript" 'WARN'
+      return $true
+    }
+
+    if ($Direction -eq 'pull') {
+      & pwsh -NoProfile -File $gcsScript -Direction pull
+    }
+    elseif ($Direction -eq 'push') {
+      & pwsh -NoProfile -File $gcsScript -Direction push -Compress
+    }
+    else {
+      & pwsh -NoProfile -File $gcsScript -Direction sync -Prune
+    }
+
+    Log "✓ GCS sync complete"
+    return $true
+  }
+  catch {
+    Log "Failed to sync with GCS: $_" 'WARN'
+    return $true  # Non-fatal; continue sync
+  }
+}
+
 # Main workflow
 function Main {
   Assert-GitAvailable
   Assert-DirectoryExists $LocalRepo
 
   Log "=== Vision Cortex Tri-Directional Sync ===" 'INFO'
-  Log "Mode: $SyncMode | DryRun: $DryRun | Verbose: $Verbose"
+  Log "Mode: $SyncMode | DryRun: $DryRun | IncludeGCS: $IncludeGCS | Verbose: $Verbose"
 
   if ($SyncMode -in @('full', 'pull', 'cron')) {
     Log "--- PULL Phase ---"
     Sync-FromGitHub | Out-Null
     Sync-FromGoogleDrive | Out-Null
+    if ($IncludeGCS) { Sync-WithGCS -Direction pull | Out-Null }
   }
 
   if ($SyncMode -in @('full', 'push')) {
     Log "--- PUSH Phase ---"
     Sync-ToGitHub | Out-Null
     Sync-ToGoogleDrive | Out-Null
+    if ($IncludeGCS) { Sync-WithGCS -Direction push | Out-Null }
+  }
+
+  if ($SyncMode -eq 'full' -and $IncludeGCS) {
+    Log "--- PRUNE Phase (GCS) ---"
+    & pwsh -NoProfile -File "$LocalRepo\scripts\sync-gcs-bucket.ps1" -Direction prune -Verbose
   }
 
   Log "=== Sync Complete ===" 'INFO'

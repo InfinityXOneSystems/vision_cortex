@@ -32,6 +32,7 @@ This document defines the governance model and environment variable architecture
 All environment variables follow the `INF_<SYSTEM>_<RESOURCE>` naming convention:
 
 #### AI Providers
+
 ```
 INF_ANTHROPIC_API_KEY         → Claude API (Anthropic)
 INF_GROQ_API_KEY              → Groq API (Mixtral, Llama)
@@ -40,6 +41,7 @@ INF_OPENAI_API_KEY            → OpenAI API (optional)
 ```
 
 #### Vision Cortex
+
 ```
 INF_VISION_CORTEX_REDIS_URL   → Redis connection (default: redis://localhost:6379)
 INF_VISION_CORTEX_INGEST_INTERVAL_MINUTES → Signal ingestion cadence
@@ -47,12 +49,14 @@ INF_VISION_CORTEX_MAX_SIGNALS_PER_BATCH → Batch size for scoring
 ```
 
 #### GitHub Integration
+
 ```
 INF_GITHUB_TOKEN              → Organization-level GitHub API token (admin access)
 INF_GITHUB_ORG                → Organization name (InfinityXOneSystems)
 ```
 
 #### Google Cloud
+
 ```
 INF_GCP_PROJECT_ID            → Google Cloud project (infinity-x-one-systems)
 INF_GCP_SA_KEY                → Service account JSON (base64-encoded)
@@ -60,6 +64,7 @@ INF_GCP_SA_EMAIL              → Service account email
 ```
 
 #### Security & Encryption
+
 ```
 INF_ADMIN_KEY                 → Master admin key for internal APIs
 INF_JWT_SECRET                → JWT signing secret for auth tokens
@@ -67,6 +72,7 @@ INF_ENCRYPTION_KEY            → AES-256-CBC encryption key for sensitive data
 ```
 
 #### Monitoring & Observability
+
 ```
 INF_DATADOG_API_KEY           → Datadog metrics/logs (optional)
 INF_SENTRY_DSN                → Sentry error tracking (optional)
@@ -78,12 +84,12 @@ INF_SENTRY_DSN                → Sentry error tracking (optional)
 
 ### Authorization Tiers
 
-| Tier | Role | Access | Repos | Systems |
-|------|------|--------|-------|---------|
-| **Admin** | Platform Owner | Read/Write all secrets | All 41 repos | GCP, GitHub, Drive, Local |
-| **Maintainer** | Team Lead | Read/Write Vision Cortex secrets | Foundation, Vision Cortex | GitHub, GCP, Local |
-| **Developer** | Engineer | Read secrets, push code | 1-2 assigned repos | Local .env.local only |
-| **CI/CD** | Automation | Read secrets, trigger builds | Foundation, auto-builder | GitHub Secrets only |
+| Tier           | Role           | Access                           | Repos                     | Systems                   |
+| -------------- | -------------- | -------------------------------- | ------------------------- | ------------------------- |
+| **Admin**      | Platform Owner | Read/Write all secrets           | All 41 repos              | GCP, GitHub, Drive, Local |
+| **Maintainer** | Team Lead      | Read/Write Vision Cortex secrets | Foundation, Vision Cortex | GitHub, GCP, Local        |
+| **Developer**  | Engineer       | Read secrets, push code          | 1-2 assigned repos        | Local .env.local only     |
+| **CI/CD**      | Automation     | Read secrets, trigger builds     | Foundation, auto-builder  | GitHub Secrets only       |
 
 ### Secret Rotation Policy
 
@@ -103,7 +109,7 @@ await eventBus.publish(EventChannels.AUDIT_LOG, "secret:accessed", {
   actor: "vision-cortex-ingestor",
   timestamp: new Date(),
   ip: process.env.REQUEST_IP,
-  success: true
+  success: true,
 });
 ```
 
@@ -125,17 +131,18 @@ Local (.env.local)
 
 ### Sync Frequency
 
-| Task | Interval | Direction | Trigger |
-|------|----------|-----------|---------|
-| Repo + secrets | 6 hours | Pull all → Push updates | Cron job (Task Scheduler) |
-| Secret merge | 24 hours | Sync (bi-directional) | Cron job (2 AM daily) |
-| Manual override | On-demand | User-triggered | `./sync-secrets.ps1 -Direction push` |
+| Task            | Interval  | Direction               | Trigger                              |
+| --------------- | --------- | ----------------------- | ------------------------------------ |
+| Repo + secrets  | 6 hours   | Pull all → Push updates | Cron job (Task Scheduler)            |
+| Secret merge    | 24 hours  | Sync (bi-directional)   | Cron job (2 AM daily)                |
+| Manual override | On-demand | User-triggered          | `./sync-secrets.ps1 -Direction push` |
 
 ### Sync Scripts (Windows PowerShell)
 
 Located in `scripts/`:
 
 1. **`sync-tri-directional.ps1`**: Repo sync (local ↔ GitHub ↔ Drive)
+
    ```powershell
    .\sync-tri-directional.ps1 -SyncMode cron  # Pull all, push updates (lightweight)
    .\sync-tri-directional.ps1 -SyncMode full  # Full bidirectional
@@ -157,16 +164,19 @@ Located in `scripts/`:
 ### Access Control
 
 **GitHub Secrets** (org-level, inherited by all repos):
+
 - Managed by: Platform Admin
 - Read by: CI/CD workflows, auto-builder
 - Lifecycle: Synced from local via `sync-secrets.ps1 --push`
 
 **Google Cloud Secret Manager** (project-level):
+
 - Managed by: GCP IAM (service accounts)
 - Read by: Cloud Run, Cloud Functions, local service account
 - Lifecycle: Synced from GitHub via API or manual GCP console
 
 **Local .env.local** (single machine):
+
 - Managed by: Developer
 - Read by: Local dev environment, `npm start`, `docker-compose`
 - **Never committed** (in `.gitignore`)
@@ -180,11 +190,13 @@ Located in `scripts/`:
 ### Policy Enforcement
 
 1. **Pre-commit Hook**: Scan for secrets before pushing
+
    ```bash
    npm run validate:no-secrets  # Runs in pre-commit hook
    ```
 
 2. **CI/CD Secret Validation**: GitHub Actions verify all `INF_*` vars are set
+
    ```yaml
    - name: Validate secrets
      run: |
@@ -204,14 +216,14 @@ Located in `scripts/`:
 
 With system-wide env availability, these automations unlock:
 
-| Automation | Requirements | Trigger | Output |
-|-----------|--------------|---------|--------|
-| **Vision Cortex Ingestion** | `REDIS_URL`, `INGEST_INTERVAL_MINUTES` | 6h cron | Scored signals → Redis |
-| **Auto-Builder Deployment** | `INF_GITHUB_TOKEN`, `INF_GCP_SA_KEY` | Git push → webhook | Built artifacts → GCP |
-| **Taxonomy Sync** | `INF_GITHUB_TOKEN`, `INF_GEMINI_API_KEY` | Daily 1 AM | Updated model catalog |
-| **Alert Generation** | `INF_ANTHROPIC_API_KEY`, `REDIS_URL` | Signal arrival | Alerts → Slack/Email |
-| **Outreach Orchestration** | `INF_GMAIL_*`, `INF_LINKEDIN_*` | Playbook trigger | Emails/InMails sent |
-| **Observability** | `INF_DATADOG_API_KEY`, `INF_SENTRY_DSN` | Runtime events | Metrics → Datadog |
+| Automation                  | Requirements                             | Trigger            | Output                 |
+| --------------------------- | ---------------------------------------- | ------------------ | ---------------------- |
+| **Vision Cortex Ingestion** | `REDIS_URL`, `INGEST_INTERVAL_MINUTES`   | 6h cron            | Scored signals → Redis |
+| **Auto-Builder Deployment** | `INF_GITHUB_TOKEN`, `INF_GCP_SA_KEY`     | Git push → webhook | Built artifacts → GCP  |
+| **Taxonomy Sync**           | `INF_GITHUB_TOKEN`, `INF_GEMINI_API_KEY` | Daily 1 AM         | Updated model catalog  |
+| **Alert Generation**        | `INF_ANTHROPIC_API_KEY`, `REDIS_URL`     | Signal arrival     | Alerts → Slack/Email   |
+| **Outreach Orchestration**  | `INF_GMAIL_*`, `INF_LINKEDIN_*`          | Playbook trigger   | Emails/InMails sent    |
+| **Observability**           | `INF_DATADOG_API_KEY`, `INF_SENTRY_DSN`  | Runtime events     | Metrics → Datadog      |
 
 ### Governance Checklist
 
@@ -287,6 +299,7 @@ gcloud auth list
 ### Alerting
 
 Vision Cortex publishes events for:
+
 - Secret sync failures → Slack #ops
 - Cron job failures → Email alert
 - Authorization failures → Audit log + Sentry
