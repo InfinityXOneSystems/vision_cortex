@@ -17,7 +17,7 @@ import { RedisEventBus, EventChannels } from "../utils/redis-event-bus";
 import { CourtDocketCrawler } from "./crawlers/court-docket-crawler";
 import { FDAApprovalTracker } from "./crawlers/fda-approval-tracker";
 import { LinkedInTalentTracker } from "./crawlers/linkedin-talent-tracker";
-import { EntityResolver } from "./entity-resolver";
+import { LLMEntityResolver } from "./llm-entity-resolver";
 import { ScoringEngine, type Signal, type ScoredSignal } from "./scoring-engine";
 import { CountdownAlertSystem } from "./alert-system";
 import { PlaybookRouter } from "./playbook-router";
@@ -25,6 +25,7 @@ import { OutreachGenerator } from "./outreach-generator";
 
 export interface VisionCortexConfig {
   redis?: { host: string; port: number };
+  ollama?: { baseUrl?: string; model?: string };
   crawlers?: {
     courtDocket?: { enabled: boolean; intervalHours?: number };
     fda?: { enabled: boolean; intervalHours?: number };
@@ -41,7 +42,7 @@ export interface VisionCortexConfig {
 
 export class VisionCortexOrchestrator extends EventEmitter {
   private eventBus: RedisEventBus;
-  private entityResolver: EntityResolver;
+  private entityResolver: LLMEntityResolver;
   private scoringEngine: ScoringEngine;
   private alertSystem: CountdownAlertSystem;
   private playbookRouter: PlaybookRouter;
@@ -60,7 +61,7 @@ export class VisionCortexOrchestrator extends EventEmitter {
 
     // Initialize core components
     this.eventBus = new RedisEventBus(config.redis);
-    this.entityResolver = new EntityResolver();
+    this.entityResolver = new LLMEntityResolver(config.ollama);
     this.scoringEngine = new ScoringEngine();
     this.alertSystem = new CountdownAlertSystem(config.redis);
     this.playbookRouter = new PlaybookRouter();
@@ -86,6 +87,9 @@ export class VisionCortexOrchestrator extends EventEmitter {
 
     // Connect event bus
     await this.eventBus.connect();
+
+    // Initialize LLM entity resolver
+    await this.entityResolver.initialize();
 
     // Initialize alert system
     await this.alertSystem.initialize();
