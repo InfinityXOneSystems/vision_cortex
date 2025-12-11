@@ -1,0 +1,35 @@
+{
+  "auto_stage": true,
+  "auto_commit": true,
+  "auto_push": true,
+  "fail_on_errors": true,
+  "fail_on_warnings": false,
+  "require_docstrings": true,
+  "max_line_length": 120,
+  "commit_prefix": "ci: code validation auto-commit",
+  "push_delay_seconds": 2,
+  "skip_patterns": [
+    "__pycache__/**",
+    "*.pyc",
+    ".venv/**",
+    "venv/**",
+    "node_modules/**",
+    ".git/**",
+    ".github/**",
+    "build/**",
+    "dist/**"
+  ],
+  "validators_enabled": {
+    "syntax": true,
+    "imports": true,
+    "code_style": true,
+    "docstrings": true
+  },
+  "monitoring": {
+    "enabled": true,
+    "interval_seconds": 5,
+    "check_for_changes": true,
+    "auto_validate": true,
+    "log_file": "validation_monitor.log"
+  }
+}

@@ -1,0 +1,587 @@
+# VISION CORTEX SYSTEM REQUIREMENTS & CONFIGURATION
+# Mandatory specifications for all agents and workflows
+# Version: 1.0.0
+# Last Updated: December 11, 2025
+
+system:
+  name: "Vision Cortex"
+  version: "1.0.0"
+  status: "production"
+  environment: "development"  # development, staging, production
+  
+  # Mandatory system paths
+  paths:
+    root: "vision_cortex"
+    doc_system: "vision_cortex/doc_system"
+    src: "vision_cortex/src"
+    scripts: "vision_cortex/scripts"
+    config: "vision_cortex/config"
+    data: "vision_cortex/doc_system/data"
+    logs: "vision_cortex/logs"
+    docker: "vision_cortex/docker"
+    infra: "vision_cortex/infra"
+    
+  # Mandatory Git Configuration
+  git:
+    required: true
+    auto_push: true
+    push_after_commit: true
+    push_branch: "main"
+    push_remote: "origin"
+    push_tags: true
+    commit_format: "conventional"  # conventional, semantic, freeform
+    require_validation: true
+    require_tests: false
+    
+    # Commit message templates
+    templates:
+      feature: "feat({component}): {description}"
+      fix: "fix({component}): {description}"
+      refactor: "refactor({component}): {description}"
+      docs: "docs({component}): {description}"
+      style: "style({component}): {description}"
+      test: "test({component}): {description}"
+      chore: "chore({component}): {description}"
+      
+    # What triggers auto-push
+    auto_push_triggers:
+      - code_validation_passed
+      - documentation_updated
+      - workflow_completed
+      - roadmap_item_complete
+      - todo_marked_complete
+
+# MANDATORY CODE LANGUAGE SPECIFICATIONS
+code:
+  languages:
+    python:
+      required: true
+      version: "3.8+"
+      package_manager: "pip"
+      virtual_env: "venv"
+      requirements_file: "requirements.txt"
+      entry_point: "main.py"
+      validation:
+        - syntax_check
+        - import_check
+        - style_check
+        - docstring_check
+      linters:
+        - pylint
+        - flake8
+        - black
+      type_checking: true
+      type_checker: "mypy"
+      
+    javascript:
+      required: true
+      version: "ES2020+"
+      package_manager: "npm"
+      node_version: "18+"
+      config_file: "package.json"
+      validation:
+        - syntax_check
+        - import_check
+        - console_log_check
+        - promise_handling_check
+      linters:
+        - eslint
+      formatter: "prettier"
+      
+    typescript:
+      required: false
+      version: "4.5+"
+      package_manager: "npm"
+      config_file: "tsconfig.json"
+      validation:
+        - syntax_check
+        - type_check
+        - import_check
+      linters:
+        - eslint
+      formatter: "prettier"
+      
+    json:
+      required: true
+      validation:
+        - syntax_check
+      schema_validation: false
+      
+    markdown:
+      required: true
+      validation:
+        - link_check
+        - formatting_check
+        - spellcheck: false
+
+# MANDATORY AI/ML STACK
+ai_stack:
+  enabled: true
+  models:
+    default: "claude-haiku-4.5"
+    available:
+      - "claude-haiku-4.5"
+      - "claude-sonnet-4"
+      - "gpt-4-turbo"
+      - "gpt-4o"
+      - "local-ollama"
+    
+  # LLM Providers
+  providers:
+    anthropic:
+      enabled: true
+      api_key_env: "ANTHROPIC_API_KEY"
+      models:
+        - "claude-haiku-4.5"
+        - "claude-sonnet-4"
+      
+    openai:
+      enabled: false
+      api_key_env: "OPENAI_API_KEY"
+      models:
+        - "gpt-4-turbo"
+        - "gpt-4o"
+      
+    ollama:
+      enabled: true
+      endpoint: "http://localhost:11434"
+      models:
+        - "mistral"
+        - "llama2"
+        - "neural-chat"
+  
+  # Mandatory AI features for agents
+  agent_requirements:
+    must_have_context: true
+    must_validate_output: true
+    must_log_operations: true
+    must_track_tokens: true
+    timeout_seconds: 300
+    retry_on_failure: true
+    max_retries: 3
+
+# MANDATORY TECH STACK
+tech_stack:
+  
+  runtime:
+    - python: "3.8+"
+    - nodejs: "18+"
+    - bash: "4.0+"
+  
+  databases:
+    - json: "file-based"
+    - redis: "optional"
+    - postgresql: "optional"
+  
+  containerization:
+    docker:
+      enabled: true
+      dockerfile: "Dockerfile"
+      compose: "docker-compose.yml"
+    
+  version_control:
+    git:
+      required: true
+      version: "2.30+"
+      host: "github"
+  
+  testing:
+    python:
+      - pytest
+      - unittest
+    javascript:
+      - jest
+      - mocha
+  
+  documentation:
+    markdown: true
+    format: "github-flavored-markdown"
+    generator: "custom"
+  
+  monitoring:
+    logging: true
+    log_level: "INFO"
+    log_dir: "logs"
+    
+  infrastructure:
+    terraform:
+      enabled: false
+      version: "1.0+"
+    
+    gcs:
+      enabled: true
+      bucket: "vision-cortex-bucket"
+      sync_enabled: true
+
+# MANDATORY AGENT SPECIFICATIONS
+agents:
+  
+  system_info:
+    must_provide:
+      - language: "The code language(s) used"
+      - framework: "Framework/libraries being used"
+      - dependencies: "All dependencies and versions"
+      - git_info: "Git repo, branch, remote"
+      - validation_level: "Required validation strictness"
+      - ai_model: "AI model to use for analysis"
+    
+    must_include_in_context:
+      - this_system_requirements_file
+      - current_tech_stack
+      - available_ai_models
+      - git_configuration
+      - validation_requirements
+  
+  # Code Validation Agent (mandatory)
+  code_validation:
+    required: true
+    languages: ["python", "javascript", "json", "markdown"]
+    validation_stages:
+      - syntax_check
+      - import_check
+      - style_check
+      - docstring_check
+    git_integration: true
+    auto_commit: true
+    auto_push: true
+    
+  # Auto Commit/Push Agent (mandatory)
+  auto_git:
+    required: true
+    auto_commit: true
+    auto_push: true
+    push_after_commit: true
+    staged_changes_threshold: 1
+    commit_message_format: "conventional"
+    require_validation_first: true
+    
+  # Document Indexing Agent
+  doc_indexing:
+    required: true
+    auto_index: true
+    search_enabled: true
+    cross_reference: true
+    
+  # Roadmap/Todo Agent
+  task_management:
+    required: true
+    auto_create_todos: true
+    auto_update_progress: true
+    auto_complete_items: true
+    
+  # Orchestrator
+  orchestrator:
+    required: true
+    coordinate_agents: true
+    maintain_state: true
+    handle_workflows: true
+
+# MANDATORY WORKFLOW SPECIFICATIONS
+workflows:
+  
+  # Standard Feature Development Workflow
+  feature_development:
+    name: "Feature Development"
+    stages:
+      - stage: "plan"
+        description: "Create roadmap and design docs"
+        agents: ["doc_indexing", "task_management"]
+        validation: optional
+      
+      - stage: "design"
+        description: "Design and document architecture"
+        agents: ["doc_indexing"]
+        validation: optional
+        
+      - stage: "implement"
+        description: "Write code"
+        agents: ["code_validation", "auto_git"]
+        validation: required
+        auto_commit: true
+        auto_push: true
+      
+      - stage: "validate"
+        description: "Run tests and validation"
+        agents: ["code_validation"]
+        validation: required
+        
+      - stage: "review"
+        description: "Code review"
+        agents: ["doc_indexing"]
+        validation: optional
+        
+      - stage: "merge"
+        description: "Merge to main"
+        agents: ["auto_git"]
+        validation: required
+        auto_push: true
+      
+      - stage: "document"
+        description: "Update documentation"
+        agents: ["doc_indexing", "auto_git"]
+        validation: optional
+        auto_commit: true
+        auto_push: true
+      
+      - stage: "complete"
+        description: "Mark as complete"
+        agents: ["task_management", "auto_git"]
+        validation: optional
+        auto_push: true
+  
+  # Bug Fix Workflow
+  bug_fix:
+    name: "Bug Fix Workflow"
+    stages:
+      - stage: "identify"
+        description: "Document bug"
+        agents: ["doc_indexing", "task_management"]
+        validation: optional
+      
+      - stage: "implement"
+        description: "Fix bug"
+        agents: ["code_validation", "auto_git"]
+        validation: required
+        auto_commit: true
+        auto_push: true
+      
+      - stage: "test"
+        description: "Test fix"
+        agents: ["code_validation"]
+        validation: required
+      
+      - stage: "deploy"
+        description: "Deploy fix"
+        agents: ["auto_git"]
+        validation: required
+        auto_push: true
+      
+      - stage: "verify"
+        description: "Verify in production"
+        agents: ["doc_indexing"]
+        validation: optional
+  
+  # Documentation Workflow
+  documentation:
+    name: "Documentation Update"
+    stages:
+      - stage: "update"
+        description: "Update documentation"
+        agents: ["doc_indexing"]
+        validation: optional
+      
+      - stage: "validate"
+        description: "Validate markdown"
+        agents: ["code_validation"]
+        validation: required
+      
+      - stage: "commit"
+        description: "Commit and push"
+        agents: ["auto_git"]
+        validation: optional
+        auto_commit: true
+        auto_push: true
+  
+  # Complete Work Item Workflow
+  complete_work_item:
+    name: "Complete Work Item"
+    stages:
+      - stage: "validate"
+        description: "Validate code"
+        agents: ["code_validation"]
+        validation: required
+      
+      - stage: "commit"
+        description: "Commit changes"
+        agents: ["auto_git"]
+        validation: optional
+        auto_commit: true
+        auto_push: true
+      
+      - stage: "update_docs"
+        description: "Update documentation"
+        agents: ["doc_indexing"]
+        validation: optional
+      
+      - stage: "mark_complete"
+        description: "Mark as complete"
+        agents: ["task_management"]
+        validation: optional
+      
+      - stage: "push"
+        description: "Final push"
+        agents: ["auto_git"]
+        validation: optional
+        auto_push: true
+
+# MANDATORY VALIDATION RULES
+validation:
+  
+  required_checks:
+    - syntax_validation: true
+    - import_validation: true
+    - git_status: true
+    - documentation: false
+    - tests: false
+  
+  # Fail conditions (stops the workflow)
+  fail_conditions:
+    - syntax_error
+    - unresolved_imports
+    - git_conflict
+    - uncommitted_changes_in_tracked_files
+  
+  # Warning conditions (continues but warns)
+  warning_conditions:
+    - line_length_violation
+    - missing_docstring
+    - unused_variable
+    - console_log_in_code
+    - broken_link_in_docs
+  
+  # Skip conditions (doesn't apply validation)
+  skip_conditions:
+    - file_type_excluded
+    - path_excluded
+  
+  # Auto-fix options
+  auto_fix:
+    enable_format: true
+    remove_unused_imports: true
+    fix_line_length: false
+    add_docstrings: false
+
+# MANDATORY LOGGING & MONITORING
+logging:
+  enabled: true
+  level: "INFO"
+  handlers:
+    - console
+    - file
+  
+  file:
+    path: "logs/vision_cortex.log"
+    max_size: "10MB"
+    backup_count: 5
+    format: "[%(asctime)s] %(levelname)s - %(name)s - %(message)s"
+  
+  # What must be logged
+  must_log:
+    - all_agent_operations
+    - all_git_operations
+    - all_validations
+    - all_workflows
+    - all_errors
+    - token_usage
+    - ai_model_calls
+
+# MANDATORY SECURITY SPECIFICATIONS
+security:
+  api_keys:
+    required_env_vars:
+      - ANTHROPIC_API_KEY
+      - GIT_TOKEN
+    
+    sensitive_files:
+      - .env
+      - .env.local
+      - secrets.json
+    
+    never_commit:
+      - "*.key"
+      - "*.pem"
+      - ".env*"
+      - "secrets/*"
+      - "*.secret"
+  
+  git_security:
+    require_authenticated_push: true
+    gpg_sign_commits: false
+    verify_signatures: false
+
+# DEFAULTS FOR ALL AGENTS
+defaults:
+  
+  # Default timeout for any operation
+  timeout_seconds: 300
+  
+  # Default retry behavior
+  retry_enabled: true
+  max_retries: 3
+  retry_delay_seconds: 2
+  
+  # Default logging behavior
+  log_operations: true
+  log_errors: true
+  log_warnings: true
+  
+  # Default git behavior
+  auto_commit: true
+  auto_push: true
+  commit_after_validation: true
+  push_after_commit: true
+  
+  # Default validation behavior
+  validate_before_commit: true
+  validate_before_push: true
+  strict_validation: false
+  
+  # Default output format
+  output_format: "json"
+  verbose: true
+  pretty_print: true
+
+# ENVIRONMENT PROFILES
+environments:
+  
+  development:
+    auto_push: true
+    validation_level: "strict"
+    logging_level: "DEBUG"
+    dry_run: false
+    
+  staging:
+    auto_push: true
+    validation_level: "strict"
+    logging_level: "INFO"
+    dry_run: true
+    
+  production:
+    auto_push: true
+    validation_level: "very_strict"
+    logging_level: "WARNING"
+    dry_run: true
+
+# MANDATORY SUCCESS CRITERIA
+success_criteria:
+  
+  # For code validation to pass
+  code_validation_must:
+    - complete_without_errors: true
+    - have_no_syntax_errors: true
+    - resolve_all_imports: true
+  
+  # For git operations to succeed
+  git_operations_must:
+    - have_clean_status: false  # Allow staged files
+    - have_valid_commit_message: true
+    - have_valid_remote: true
+  
+  # For workflows to complete
+  workflow_completion_must:
+    - pass_all_required_validations: true
+    - commit_all_changes: true
+    - push_all_commits: true
+    - update_roadmap_status: true
+    - update_todo_status: true
+
+# VERSION HISTORY
+versions:
+  "1.0.0":
+    date: "2025-12-11"
+    changes:
+      - "Initial system requirements specification"
+      - "Added mandatory agent specifications"
+      - "Added workflow definitions"
+      - "Added validation rules"
+      - "Added tech stack requirements"

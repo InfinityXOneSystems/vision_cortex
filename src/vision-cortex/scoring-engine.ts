@@ -24,6 +24,7 @@ export interface Signal {
     id: string;
     type: "company" | "property" | "person";
     name: string;
+    identifiers?: Record<string, string>;
   };
   triggers: {
     urgency?: number; // 0-100 (days to deadline)
@@ -301,4 +302,5 @@ export class ScoringEngine extends EventEmitter {
     this.emit("weights:updated", { weights: this.weights });
   }
 }
+
 

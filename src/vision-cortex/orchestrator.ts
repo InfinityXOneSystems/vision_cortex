@@ -42,7 +42,7 @@ export interface VisionCortexConfig {
 
 export class VisionCortexOrchestrator extends EventEmitter {
   private eventBus: RedisEventBus;
-  private entityResolver: LLMEntityResolver;
+  private LLMEntityResolver: LLMEntityResolver;
   private scoringEngine: ScoringEngine;
   private alertSystem: CountdownAlertSystem;
   private playbookRouter: PlaybookRouter;
@@ -61,7 +61,7 @@ export class VisionCortexOrchestrator extends EventEmitter {
 
     // Initialize core components
     this.eventBus = new RedisEventBus(config.redis);
-    this.entityResolver = new LLMEntityResolver(config.ollama);
+    this.LLMEntityResolver = new LLMEntityResolver(config.ollama);
     this.scoringEngine = new ScoringEngine();
     this.alertSystem = new CountdownAlertSystem(config.redis);
     this.playbookRouter = new PlaybookRouter();
@@ -89,7 +89,7 @@ export class VisionCortexOrchestrator extends EventEmitter {
     await this.eventBus.connect();
 
     // Initialize LLM entity resolver
-    await this.entityResolver.initialize();
+    await this.LLMEntityResolver.initialize();
 
     // Initialize alert system
     await this.alertSystem.initialize();
@@ -135,9 +135,9 @@ export class VisionCortexOrchestrator extends EventEmitter {
    */
   private wireEventHandlers(): void {
     // 1. SIGNAL INGESTION â†’ ENTITY RESOLUTION
-    this.eventBus.subscribe(EventChannels.SIGNAL_INGESTED, (event) => {
+    this.eventBus.subscribe(EventChannels.SIGNAL_INGESTED, async (event) => {
       const signal = event.payload as Signal;
-      const entity = this.entityResolver.resolveEntity(signal);
+      const entity = await this.LLMEntityResolver.resolveEntity(signal);
 
       this.emit("signal:resolved", {
         signalId: signal.signalId,
@@ -197,7 +197,7 @@ export class VisionCortexOrchestrator extends EventEmitter {
     );
 
     // Resolve entity
-    const entity = this.entityResolver.resolveEntity(signal);
+    const entity = await this.LLMEntityResolver.resolveEntity(signal);
 
     // Score signal
     const scoredSignal = this.scoringEngine.scoreSignal(signal);
@@ -241,13 +241,13 @@ export class VisionCortexOrchestrator extends EventEmitter {
    * Get system-wide metrics
    */
   getMetrics(): {
-    entities: ReturnType<EntityResolver["getStats"]>;
+    entities: ReturnType<LLMEntityResolver["getStats"]>;
     alerts: ReturnType<CountdownAlertSystem["getMetrics"]>;
     playbooks: ReturnType<PlaybookRouter["getMetrics"]>;
     outreach: ReturnType<OutreachGenerator["getMetrics"]>;
   } {
     return {
-      entities: this.entityResolver.getStats(),
+      entities: this.LLMEntityResolver.getStats(),
       alerts: this.alertSystem.getMetrics(),
       playbooks: this.playbookRouter.getMetrics(),
       outreach: this.outreachGenerator.getMetrics(),
@@ -257,15 +257,15 @@ export class VisionCortexOrchestrator extends EventEmitter {
   /**
    * Search entities
    */
-  searchEntities(query: string, limit?: number): ReturnType<EntityResolver["searchEntities"]> {
-    return this.entityResolver.searchEntities(query, limit);
+  searchEntities(query: string, limit?: number): ReturnType<LLMEntityResolver["searchEntities"]> {
+    return this.LLMEntityResolver.searchEntities(query, limit);
   }
 
   /**
    * Get entity timeline
    */
-  getEntityTimeline(entityId: string): ReturnType<EntityResolver["getEntityTimeline"]> {
-    return this.entityResolver.getEntityTimeline(entityId);
+  getEntityTimeline(entityId: string): ReturnType<LLMEntityResolver["getEntityTimeline"]> {
+    return this.LLMEntityResolver.getEntityTimeline(entityId);
   }
 
   /**
@@ -347,4 +347,13 @@ export class VisionCortexOrchestrator extends EventEmitter {
  * const metrics = orchestrator.getMetrics();
  * console.log(metrics);
  */
+
+
+
+
+
+
+
+
+
 
