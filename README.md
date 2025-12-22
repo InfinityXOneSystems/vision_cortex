@@ -1,8 +1,58 @@
-# Vision Cortex (Standalone Repo Layout)
+# 🧠 Vision Cortex Quantum Intelligence System
 
-This folder is the seed for the **InfinityXOneSystems/vision_cortex** repository. It packages the Vision Cortex intelligence system (crawlers, universal ingestor, orchestrator, playbooks) into a repo-ready layout and includes instructions to mirror the same structure into Google Workspace (Docs + Sheets) for living documentation.
+**FAANG-Level Meta-Intelligence Architecture**  
+**Version:** v1.0 - Production Ready ✅
 
-## Repository Layout (ready to export to `vision_cortex` repo)
+Vision Cortex is **not an LLM**. It's a meta-intelligence layer that thinks across models, time, and domains to produce asymmetric, non-obvious insights through advanced multi-model orchestration.
+
+## 🎯 Executive Philosophy
+
+**If the output is obvious, it failed.**
+
+This system operates at FAANG internal service standards with:
+- 🧠 **Asymmetric intelligence** - Finds what others won't see, won't believe, or will see too late
+- ⏰ **Predictive insights** - Intelligence with decay windows and temporal urgency  
+- 🌐 **Cross-domain synthesis** - Scales from real estate to finance to defense without refactor
+- 🎯 **Conviction vs Confidence** - Distinguishes statistical certainty from strategic weight
+- 🔒 **Structural entitlement** - Clean paywall integration, never cosmetic access restrictions
+
+## 🏗️ FAANG-Level Architecture
+
+### Core Intelligence Envelope
+Every Vision Cortex response follows this canonical structure:
+- **Intelligence versioning** (`v1.0`) with revision tracking
+- **Confidence vs conviction** distinction (statistical certainty vs strategic weight)
+- **Model consensus** scoring with participating provider tracking
+- **Why now** field - the sentence that closes deals
+- **Entitlement metadata** - clean tier requirements and upgrade messaging
+- **Decay windows** - intelligence expiration with temporal urgency
+
+### Anti-AI Slop Protection
+Built-in synthesis rejection rules prevent low-quality intelligence:
+- Minimum 2 participating models
+- Agreement score ≥ 0.65
+- Confidence threshold ≥ 0.3
+- Maximum 30s synthesis time
+- Required fields validation
+
+### Multi-LLM Orchestration
+- **Vertex AI** (primary provider)
+- **Anthropic Claude 3.5 Sonnet** 
+- **Google Gemini 2.0 Pro/Flash**
+- **OpenAI GPT-4** (fallback)
+- Modular provider factory pattern
+
+## 📡 Production API Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /vision-cortex/intelligence/synthesize` | Generate quantum intelligence |
+| `GET /vision-cortex/signals` | Surface non-obvious signals |
+| `GET /vision-cortex/anomalies` | Identify rare, high-impact events |
+| `GET /vision-cortex/classified/preview` | Premium intelligence preview |
+| `GET /vision-cortex/status` | System health monitoring |
+
+## Repository Layout (Production Ready)
 ```
 vision_cortex/
 ├─ README.md                    # This file (how to stand up & mirror)

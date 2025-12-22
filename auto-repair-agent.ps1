@@ -1,19 +1,19 @@
-# ============================================================================
+﻿# ============================================================================
 # AUTONOMOUS CODE REPAIR AGENT - Vision Cortex
-# Analyze → Diagnose → Validate → Fix → Heal → Compliance
+# Analyze â†’ Diagnose â†’ Validate â†’ Fix â†’ Heal â†’ Compliance
 # ============================================================================
 
 $ErrorActionPreference = "Continue"
 $ProgressPreference = "SilentlyContinue"
 
-Write-Host "🤖 AUTONOMOUS REPAIR AGENT INITIALIZED" -ForegroundColor Cyan
+Write-Host "ðŸ¤– AUTONOMOUS REPAIR AGENT INITIALIZED" -ForegroundColor Cyan
 Set-Location "C:\Users\JARVIS\OneDrive\Documents\vision_cortex"
 
 $PassCount = 0
 $MaxPasses = 10
 
 function Analyze {
-    Write-Host "`n📊 PHASE 1: ANALYZE" -ForegroundColor Yellow
+    Write-Host "`nðŸ“Š PHASE 1: ANALYZE" -ForegroundColor Yellow
     Write-Host "Scanning project structure and dependencies..."
     
     $tscOutput = & npm run typecheck 2>&1
@@ -30,15 +30,15 @@ function Analyze {
     }
     
     $totalErrors = ($errors.Values | ForEach-Object { $_.Count } | Measure-Object -Sum).Sum
-    Write-Host "✓ Found $($errors.Count) files with errors" -ForegroundColor Green
-    Write-Host "✓ Total errors: $totalErrors" -ForegroundColor Green
+    Write-Host "âœ“ Found $($errors.Count) files with errors" -ForegroundColor Green
+    Write-Host "âœ“ Total errors: $totalErrors" -ForegroundColor Green
     
     return $errors
 }
 
 function Diagnose {
     param($Errors)
-    Write-Host "`n🔍 PHASE 2: DIAGNOSE" -ForegroundColor Yellow
+    Write-Host "`nðŸ” PHASE 2: DIAGNOSE" -ForegroundColor Yellow
     Write-Host "Categorizing error types..."
     
     $errorTypes = @{
@@ -51,11 +51,11 @@ function Diagnose {
     }
     
     foreach ($file in $Errors.Keys) {
-        Write-Host "  📄 $file" -ForegroundColor Cyan
+        Write-Host "  ðŸ“„ $file" -ForegroundColor Cyan
         foreach ($error in $Errors[$file]) {
             foreach ($code in $errorTypes.Keys) {
                 if ($error -match $code) {
-                    Write-Host "    ⚠️  $code - $($errorTypes[$code])" -ForegroundColor Red
+                    Write-Host "    âš ï¸  $code - $($errorTypes[$code])" -ForegroundColor Red
                 }
             }
         }
@@ -63,7 +63,7 @@ function Diagnose {
 }
 
 function FixSignalEntity {
-    Write-Host "`n🔧 FIXING: Signal entity identifiers" -ForegroundColor Magenta
+    Write-Host "`nðŸ”§ FIXING: Signal entity identifiers" -ForegroundColor Magenta
     
     $file = "src/vision-cortex/scoring-engine.ts"
     $content = Get-Content $file -Raw
@@ -88,14 +88,14 @@ function FixSignalEntity {
     if ($content -match [regex]::Escape($oldEntity)) {
         $content = $content -replace [regex]::Escape($oldEntity), $newEntity
         $content | Set-Content $file -Encoding UTF8
-        Write-Host "✓ Updated Signal.entity interface in $file" -ForegroundColor Green
+        Write-Host "âœ“ Updated Signal.entity interface in $file" -ForegroundColor Green
         return $true
     }
     return $false
 }
 
 function FixLevenshteinUndefined {
-    Write-Host "`n🔧 FIXING: Levenshtein distance undefined safety" -ForegroundColor Magenta
+    Write-Host "`nðŸ”§ FIXING: Levenshtein distance undefined safety" -ForegroundColor Magenta
     
     $file = "src/vision-cortex/llm-entity-resolver.ts"
     $content = Get-Content $file -Raw
@@ -110,12 +110,12 @@ function FixLevenshteinUndefined {
     $content = $content -replace 'return matrix\[b\.length\]\[a\.length\];', 'return matrix[b.length]![a.length]!;'
     
     $content | Set-Content $file -Encoding UTF8
-    Write-Host "✓ Fixed Levenshtein distance undefined safety" -ForegroundColor Green
+    Write-Host "âœ“ Fixed Levenshtein distance undefined safety" -ForegroundColor Green
     return $true
 }
 
 function FixOrchestratorAwait {
-    Write-Host "`n🔧 FIXING: Orchestrator missing await operators" -ForegroundColor Magenta
+    Write-Host "`nðŸ”§ FIXING: Orchestrator missing await operators" -ForegroundColor Magenta
     
     $file = "src/vision-cortex/orchestrator.ts"
     $content = Get-Content $file -Raw
@@ -124,12 +124,12 @@ function FixOrchestratorAwait {
     $content = $content -replace 'EntityResolver', 'LLMEntityResolver'
     
     $content | Set-Content $file -Encoding UTF8
-    Write-Host "✓ Fixed orchestrator type references" -ForegroundColor Green
+    Write-Host "âœ“ Fixed orchestrator type references" -ForegroundColor Green
     return $true
 }
 
 function FixRouterNullCheck {
-    Write-Host "`n🔧 FIXING: Router null/undefined checks" -ForegroundColor Magenta
+    Write-Host "`nðŸ”§ FIXING: Router null/undefined checks" -ForegroundColor Magenta
     
     $file = "src/llm-router/router.ts"
     $content = Get-Content $file -Raw
@@ -138,12 +138,12 @@ function FixRouterNullCheck {
     $content = $content -replace 'let selectedProvider: ProviderConfig \| null;', 'let selectedProvider: ProviderConfig | undefined;'
     
     $content | Set-Content $file -Encoding UTF8
-    Write-Host "✓ Fixed router type declarations" -ForegroundColor Green
+    Write-Host "âœ“ Fixed router type declarations" -ForegroundColor Green
     return $true
 }
 
 function Heal {
-    Write-Host "`n❤️  PHASE 4: HEAL" -ForegroundColor Yellow
+    Write-Host "`nâ¤ï¸  PHASE 4: HEAL" -ForegroundColor Yellow
     Write-Host "Applying semantic type corrections..."
     
     FixSignalEntity
@@ -151,11 +151,11 @@ function Heal {
     FixOrchestratorAwait
     FixRouterNullCheck
     
-    Write-Host "✓ Healing phase complete" -ForegroundColor Green
+    Write-Host "âœ“ Healing phase complete" -ForegroundColor Green
 }
 
 function Validate {
-    Write-Host "`n✅ PHASE 3: VALIDATE" -ForegroundColor Yellow
+    Write-Host "`nâœ… PHASE 3: VALIDATE" -ForegroundColor Yellow
     Write-Host "Running TypeScript compiler..."
     
     $tscOutput = & npm run typecheck 2>&1
@@ -170,42 +170,42 @@ function Validate {
     }
     
     if ($errorCount -eq 0) {
-        Write-Host "✓ TypeScript validation passed!" -ForegroundColor Green
+        Write-Host "âœ“ TypeScript validation passed!" -ForegroundColor Green
         return $true
     } else {
-        Write-Host "⚠️  Found $errorCount errors" -ForegroundColor Yellow
-        $errorLines[0..3] | ForEach-Object { Write-Host "  ❌ $_" -ForegroundColor Red }
+        Write-Host "âš ï¸  Found $errorCount errors" -ForegroundColor Yellow
+        $errorLines[0..3] | ForEach-Object { Write-Host "  âŒ $_" -ForegroundColor Red }
         return $false
     }
 }
 
 function Compliance {
-    Write-Host "`n🛡️  PHASE 5: COMPLIANCE" -ForegroundColor Yellow
+    Write-Host "`nðŸ›¡ï¸  PHASE 5: COMPLIANCE" -ForegroundColor Yellow
     Write-Host "Running linting and code quality checks..."
     
     $lintOutput = & npm run lint 2>&1
     $lintErrors = @($lintOutput | Where-Object { $_ -match "error|Error" }).Count
     
     if ($lintErrors -eq 0) {
-        Write-Host "✓ Linting passed!" -ForegroundColor Green
+        Write-Host "âœ“ Linting passed!" -ForegroundColor Green
     } else {
-        Write-Host "⚠️  $lintErrors lint issues found" -ForegroundColor Yellow
+        Write-Host "âš ï¸  $lintErrors lint issues found" -ForegroundColor Yellow
     }
     
-    Write-Host "✓ Compliance check complete" -ForegroundColor Green
+    Write-Host "âœ“ Compliance check complete" -ForegroundColor Green
 }
 
 # MAIN EXECUTION LOOP
 while ($PassCount -lt $MaxPasses) {
     $PassCount++
-    Write-Host "`n╔════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "║         REPAIR CYCLE #$PassCount                              ║" -ForegroundColor Cyan
-    Write-Host "╚════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+    Write-Host "`nâ•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—" -ForegroundColor Cyan
+    Write-Host "â•‘         REPAIR CYCLE #$PassCount                              â•‘" -ForegroundColor Cyan
+    Write-Host "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
     
     $errors = Analyze
     
     if ($errors.Count -eq 0) {
-        Write-Host "`n🎉 NO ERRORS DETECTED! System is healthy." -ForegroundColor Green
+        Write-Host "`nðŸŽ‰ NO ERRORS DETECTED! System is healthy." -ForegroundColor Green
         break
     }
     
@@ -213,17 +213,18 @@ while ($PassCount -lt $MaxPasses) {
     Heal
     
     if (Validate) {
-        Write-Host "`n✨ VALIDATION PASSED!" -ForegroundColor Green
+        Write-Host "`nâœ¨ VALIDATION PASSED!" -ForegroundColor Green
         Compliance
         break
     }
     
     if ($PassCount -eq $MaxPasses) {
-        Write-Host "`n⚠️  Maximum repair cycles reached" -ForegroundColor Red
+        Write-Host "`nâš ï¸  Maximum repair cycles reached" -ForegroundColor Red
         break
     }
 }
 
-Write-Host "`n════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "`nâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
 Write-Host "REPAIR AGENT COMPLETE - $PassCount cycles executed" -ForegroundColor Cyan
-Write-Host "════════════════════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor Cyan
+

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 Sync credentials from local .env.local to GitHub Secrets + Google Cloud Secret Manager
 
@@ -82,10 +82,10 @@ function Push-ToGitHubSecrets {
         # Use GitHub CLI (gh) to set organization secret
         # Requires: gh auth login and org admin access
         & gh secret set $key --body $secretValue --org $GitHubOrg 2>&1 | Out-Null
-        Log "  ✓ $key → GitHub Secrets"
+        Log "  âœ“ $key â†’ GitHub Secrets"
       }
       catch {
-        Log "  ✗ Failed to set $key: $_" 'ERROR'
+        Log "  âœ— Failed to set $key: $_" 'ERROR'
         $failed += $key
       }
     }
@@ -96,7 +96,7 @@ function Push-ToGitHubSecrets {
     return $false
   }
 
-  Log "✓ Pushed secrets to GitHub"
+  Log "âœ“ Pushed secrets to GitHub"
   return $true
 }
 
@@ -130,10 +130,10 @@ function Push-ToGCPSecrets {
           echo $secretValue | & gcloud secrets create $secretName --data-file=- --project=$GCPProject | Out-Null
         }
 
-        Log "  ✓ $secretName → GCP Secret Manager"
+        Log "  âœ“ $secretName â†’ GCP Secret Manager"
       }
       catch {
-        Log "  ✗ Failed to set $secretName: $_" 'ERROR'
+        Log "  âœ— Failed to set $secretName: $_" 'ERROR'
         $failed += $secretName
       }
     }
@@ -144,7 +144,7 @@ function Push-ToGCPSecrets {
     return $false
   }
 
-  Log "✓ Pushed secrets to GCP"
+  Log "âœ“ Pushed secrets to GCP"
   return $true
 }
 
@@ -157,7 +157,7 @@ function Pull-FromGitHubSecrets {
   try {
     # List all org secrets (requires jq or manual parsing)
     # Note: GitHub API doesn't list secret values (security); only pull what you know about
-    Log "⚠ GitHub secret list not directly accessible (API limitation); use manual approach or GitHub CLI"
+    Log "âš  GitHub secret list not directly accessible (API limitation); use manual approach or GitHub CLI"
     return $secrets
   }
   catch {
@@ -183,7 +183,7 @@ function Pull-FromGCPSecrets {
       # Get latest version value
       $value = & gcloud secrets versions access latest --secret=$secretName --project=$GCPProject
       $secrets[$key] = $value.Trim()
-      Log "  ✓ $secretName → local"
+      Log "  âœ“ $secretName â†’ local"
     }
 
     return $secrets
@@ -208,7 +208,7 @@ function Write-LocalEnv {
   }
 
   $content | Set-Content -Path $EnvFile -Encoding UTF8
-  Log "✓ Wrote .env.local with $($Env.Count) variables"
+  Log "âœ“ Wrote .env.local with $($Env.Count) variables"
 }
 
 # Main workflow
@@ -265,3 +265,4 @@ function Main {
 
 # Run
 Main
+

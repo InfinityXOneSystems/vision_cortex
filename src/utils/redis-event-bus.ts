@@ -205,6 +205,12 @@ export const EventChannels = {
   // System Events
   SYSTEM_HEALTH_CHECK: "system:health-check",
   DATA_CONTRACT_VIOLATION: "system:data-contract-violation",
+
+  // Agent Communication Events
+  AGENT_COMMUNICATION: "agent:communication",
+  WORKFLOW_STAGE: "agent:workflow-stage",
+  AGENT_STARTED: "agent:started",
+  AGENT_STOPPED: "agent:stopped",
 } as const;
 
 /**

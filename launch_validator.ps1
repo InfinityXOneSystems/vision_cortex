@@ -1,4 +1,4 @@
-#!/usr/bin/env powershell
+﻿#!/usr/bin/env powershell
 <#
 .SYNOPSIS
     Auto Code Validator & Commit Agent Launcher
@@ -69,9 +69,9 @@ function Get-PythonExecutable {
 
 function Show-Banner {
     Write-Host ""
-    Write-Host "╔════════════════════════════════════════════════════════════════════════════╗" -ForegroundColor $Colors.Header
-    Write-Host "║                  AUTO CODE VALIDATOR & COMMIT AGENT                        ║" -ForegroundColor $Colors.Header
-    Write-Host "╚════════════════════════════════════════════════════════════════════════════╝" -ForegroundColor $Colors.Header
+    Write-Host "â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—" -ForegroundColor $Colors.Header
+    Write-Host "â•‘                  AUTO CODE VALIDATOR & COMMIT AGENT                        â•‘" -ForegroundColor $Colors.Header
+    Write-Host "â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" -ForegroundColor $Colors.Header
     Write-Host ""
 }
 
@@ -109,7 +109,7 @@ function Launch-Validator {
     $validatorScript = Join-Path $scriptDir "auto_code_validator_agent.py"
     
     if (-not (Test-Path $validatorScript)) {
-        Write-Status "✗ Validator script not found: $validatorScript" "Error"
+        Write-Status "âœ— Validator script not found: $validatorScript" "Error"
         return $false
     }
     
@@ -122,25 +122,25 @@ function Launch-Validator {
     
     switch ($Mode) {
         "validate-only" {
-            Write-Status "🔍 Running validation only..." "Info"
+            Write-Status "ðŸ” Running validation only..." "Info"
             $arguments += "--validate-only"
         }
         "auto-commit" {
-            Write-Status "✓ Running validation and commit..." "Info"
+            Write-Status "âœ“ Running validation and commit..." "Info"
             $arguments += "--no-push"
         }
         "auto-push" {
-            Write-Status "🚀 Running validation, commit, and push..." "Info"
+            Write-Status "ðŸš€ Running validation, commit, and push..." "Info"
             if (-not $Push) {
                 $arguments += "--no-push"
             }
         }
         "continuous" {
-            Write-Status "⏱ Starting continuous monitor (interval: ${Interval}s)..." "Info"
+            Write-Status "â± Starting continuous monitor (interval: ${Interval}s)..." "Info"
             $monitorScript = Join-Path $scriptDir "validation_monitor.py"
             
             if (-not (Test-Path $monitorScript)) {
-                Write-Status "✗ Monitor script not found: $monitorScript" "Error"
+                Write-Status "âœ— Monitor script not found: $monitorScript" "Error"
                 return $false
             }
             
@@ -168,9 +168,9 @@ function Launch-Validator {
     Write-Host ""
     
     if ($exitCode -eq 0) {
-        Write-Status "✓ Operation completed successfully" "Success"
+        Write-Status "âœ“ Operation completed successfully" "Success"
     } else {
-        Write-Status "✗ Operation failed (exit code: $exitCode)" "Error"
+        Write-Status "âœ— Operation failed (exit code: $exitCode)" "Error"
     }
     
     return $exitCode -eq 0
@@ -187,7 +187,7 @@ if ($Mode -eq "status") {
 
 if ($Mode -eq "continuous") {
     $monitorScript = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "validation_monitor.py"
-    Write-Status "ℹ Press Ctrl+C to stop monitoring" "Info"
+    Write-Status "â„¹ Press Ctrl+C to stop monitoring" "Info"
     Write-Host ""
 }
 
@@ -198,3 +198,4 @@ if ($success) {
 } else {
     exit 1
 }
+

@@ -21,6 +21,10 @@ import type {
 } from "./intelligence-api";
 
 const app = express();
+
+// Security: Disable X-Powered-By header
+app.disable('x-powered-by');
+
 const httpServer = createServer(app);
 const wss = new WebSocketServer({ server: httpServer });
 

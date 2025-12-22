@@ -1,0 +1,264 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vision-cortex-config
+  namespace: vision-cortex
+data:
+  NODE_ENV: "production"
+  REDIS_URL: "redis://redis-service:6379"
+  PORT: "4000"
+  LOG_LEVEL: "info"
+  HEALTH_CHECK_INTERVAL: "30000"
+  
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vision-cortex-secrets
+  namespace: vision-cortex
+type: Opaque
+stringData:
+  GOOGLE_APPLICATION_CREDENTIALS_JSON: |
+    # Base64 encoded Google Cloud service account JSON
+    # Replace with actual credentials
+  OPENAI_API_KEY: ""
+  ANTHROPIC_API_KEY: ""
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: vision-cortex
+spec:
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  namespace: vision-cortex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        command: ["redis-server", "--appendonly", "yes"]
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: vision-cortex
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vision-cortex-service
+  namespace: vision-cortex
+spec:
+  selector:
+    app: vision-cortex
+  ports:
+    - port: 80
+      targetPort: 4000
+      name: http
+    - port: 443
+      targetPort: 4000
+      name: https
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vision-cortex-deployment
+  namespace: vision-cortex
+  labels:
+    app: vision-cortex
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vision-cortex
+  template:
+    metadata:
+      labels:
+        app: vision-cortex
+    spec:
+      containers:
+      - name: vision-cortex
+        image: gcr.io/PROJECT_ID/vision-cortex:latest
+        ports:
+        - containerPort: 4000
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: vision-cortex-config
+              key: NODE_ENV
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: vision-cortex-config
+              key: REDIS_URL
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: vision-cortex-config
+              key: PORT
+        - name: GOOGLE_APPLICATION_CREDENTIALS_JSON
+          valueFrom:
+            secretKeyRef:
+              name: vision-cortex-secrets
+              key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vision-cortex-secrets
+              key: OPENAI_API_KEY
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: vision-cortex-secrets
+              key: ANTHROPIC_API_KEY
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 4000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: logs-volume
+          mountPath: /app/logs
+      volumes:
+      - name: logs-volume
+        emptyDir: {}
+      initContainers:
+      - name: wait-for-redis
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nc -z redis-service 6379; do echo waiting for redis; sleep 2; done;']
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vision-cortex-hpa
+  namespace: vision-cortex
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vision-cortex-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vision-cortex-ingress
+  namespace: vision-cortex
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "vision-cortex-ip"
+    networking.gke.io/managed-certificates: "vision-cortex-ssl-cert"
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  rules:
+  - host: vision-cortex.infinityxoneintelligence.com
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: vision-cortex-service
+            port:
+              number: 80
+
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: vision-cortex-ssl-cert
+  namespace: vision-cortex
+spec:
+  domains:
+    - vision-cortex.infinityxoneintelligence.com
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vision-cortex
+  labels:
+    name: vision-cortex

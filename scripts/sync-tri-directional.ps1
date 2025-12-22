@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 Tri-directional sync for Vision Cortex: local <-> GitHub <-> Google Drive
 
@@ -80,7 +80,7 @@ function Sync-FromGitHub {
 
     # Pull main branch
     & git pull origin main --no-edit
-    Log "✓ Pulled from GitHub"
+    Log "âœ“ Pulled from GitHub"
   }
   catch {
     Log "Failed to pull from GitHub: $_" 'ERROR'
@@ -98,8 +98,8 @@ function Sync-FromGoogleDrive {
   Log "Pulling from Google Drive ($DriveFolder)..."
 
   # TODO: Implement Google Drive API pull
-  # For now, placeholder—requires rclone or Google API client
-  Log "⚠ Google Drive pull not yet implemented (requires rclone or Google API setup)"
+  # For now, placeholderâ€”requires rclone or Google API client
+  Log "âš  Google Drive pull not yet implemented (requires rclone or Google API setup)"
 
   return $true
 }
@@ -126,7 +126,7 @@ function Sync-ToGitHub {
 
     # Push to main
     & git push origin main
-    Log "✓ Pushed to GitHub"
+    Log "âœ“ Pushed to GitHub"
   }
   catch {
     Log "Failed to push to GitHub: $_" 'ERROR'
@@ -144,8 +144,8 @@ function Sync-ToGoogleDrive {
   Log "Uploading to Google Drive..."
 
   # TODO: Implement Google Drive API upload
-  # For now, placeholder—requires rclone or Google API client
-  Log "⚠ Google Drive upload not yet implemented (requires rclone or Google API setup)"
+  # For now, placeholderâ€”requires rclone or Google API client
+  Log "âš  Google Drive upload not yet implemented (requires rclone or Google API setup)"
 
   return $true
 }
@@ -169,7 +169,7 @@ function Sync-WithGCS {
     # Run GCS sync script
     $gcsScript = "$LocalRepo\scripts\sync-gcs-bucket.ps1"
     if (-not (Test-Path $gcsScript)) {
-      Log "  ⚠ GCS sync script not found at $gcsScript" 'WARN'
+      Log "  âš  GCS sync script not found at $gcsScript" 'WARN'
       return $true
     }
 
@@ -183,7 +183,7 @@ function Sync-WithGCS {
       & pwsh -NoProfile -File $gcsScript -Direction sync -Prune
     }
 
-    Log "✓ GCS sync complete"
+    Log "âœ“ GCS sync complete"
     return $true
   }
   catch {
@@ -224,3 +224,4 @@ function Main {
 
 # Run
 Main
+

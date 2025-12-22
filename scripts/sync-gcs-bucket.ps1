@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 Bi-directional sync with Google Cloud Storage (GCS) bucket for Vision Cortex
 Optimized with pruning, deduplication, and usage tracking
@@ -12,7 +12,7 @@ Synchronizes files between local repo and GCS bucket:
 - --usage: Show bucket usage metrics and cost analysis
 
 Key Features:
-1. Bi-directional sync (local ↔ GCS)
+1. Bi-directional sync (local â†” GCS)
 2. Automatic pruning (keep N versions, delete by age)
 3. Deduplication (skip unchanged files via MD5 hash)
 4. Usage tracking (bytes, count, cost projection)
@@ -183,7 +183,7 @@ function Push-ToGCS {
 
     # Skip if hashes match (deduplication)
     if ($gcsInfo -and $gcsInfo.hash -eq $localInfo.hash) {
-      Log "  ↻ $relPath (unchanged)" 'DEBUG'
+      Log "  â†» $relPath (unchanged)" 'DEBUG'
       $skipped++
       continue
     }
@@ -197,10 +197,10 @@ function Push-ToGCS {
       & gzip -k -f $localFile 2>&1 | Out-Null
       $uploadFile = $gzipFile
       $uploadPath = "$gcsPath.gz"
-      Log "  ⊞ $relPath → $gcsPath.gz (compressed)" 'DEBUG'
+      Log "  âŠž $relPath â†’ $gcsPath.gz (compressed)" 'DEBUG'
     }
     else {
-      Log "  ↑ $relPath → $gcsPath" 'DEBUG'
+      Log "  â†‘ $relPath â†’ $gcsPath" 'DEBUG'
     }
 
     if ($DryRun) {
@@ -215,11 +215,11 @@ function Push-ToGCS {
       $totalSize += $localInfo.size
     }
     catch {
-      Log "  ✗ Failed: $relPath - $_" 'ERROR'
+      Log "  âœ— Failed: $relPath - $_" 'ERROR'
     }
   }
 
-  Log "✓ Pushed $pushed files ($([Math]::Round($totalSize/1MB, 2)) MB), skipped $skipped (unchanged)" 'SUCCESS'
+  Log "âœ“ Pushed $pushed files ($([Math]::Round($totalSize/1MB, 2)) MB), skipped $skipped (unchanged)" 'SUCCESS'
 }
 
 # Pull files from GCS to local
@@ -242,12 +242,12 @@ function Pull-FromGCS {
 
     # Check if local is newer (skip pull)
     if ((Test-Path $localFile) -and (Get-Item $localFile).LastWriteTime -gt [datetime]$gcsManifest[$gcsFile].modified) {
-      Log "  ↻ $gcsFile (local newer)" 'DEBUG'
+      Log "  â†» $gcsFile (local newer)" 'DEBUG'
       $skipped++
       continue
     }
 
-    Log "  ↓ $gcsFile ← $gcsPath" 'DEBUG'
+    Log "  â†“ $gcsFile â† $gcsPath" 'DEBUG'
 
     if ($DryRun) {
       $pulled++
@@ -259,11 +259,11 @@ function Pull-FromGCS {
       $pulled++
     }
     catch {
-      Log "  ✗ Failed: $gcsFile - $_" 'ERROR'
+      Log "  âœ— Failed: $gcsFile - $_" 'ERROR'
     }
   }
 
-  Log "✓ Pulled $pulled files, skipped $skipped (local newer)" 'SUCCESS'
+  Log "âœ“ Pulled $pulled files, skipped $skipped (local newer)" 'SUCCESS'
 }
 
 # Bi-directional sync with conflict resolution
@@ -274,32 +274,32 @@ function Sync-Bidirectional {
   $gcsManifest = Get-GCSManifest
 
   # 1. Push new/modified local files
-  Log "  Phase 1: Pushing local → GCS" 'INFO'
+  Log "  Phase 1: Pushing local â†’ GCS" 'INFO'
   foreach ($relPath in $localManifest.Keys) {
     if (-not $gcsManifest.ContainsKey($relPath)) {
-      Log "    ↑ New: $relPath" 'DEBUG'
+      Log "    â†‘ New: $relPath" 'DEBUG'
       # Push logic here
     }
     elseif ($gcsManifest[$relPath].hash -ne $localManifest[$relPath].hash) {
       $localTime = $localManifest[$relPath].modified
       $gcsTime = $gcsManifest[$relPath].modified
       if ($localTime -gt $gcsTime) {
-        Log "    ↑ Modified: $relPath" 'DEBUG'
+        Log "    â†‘ Modified: $relPath" 'DEBUG'
         # Push logic
       }
     }
   }
 
   # 2. Pull new GCS files
-  Log "  Phase 2: Pulling GCS → local" 'INFO'
+  Log "  Phase 2: Pulling GCS â†’ local" 'INFO'
   foreach ($gcsFile in $gcsManifest.Keys) {
     if (-not $localManifest.ContainsKey($gcsFile)) {
-      Log "    ↓ New in GCS: $gcsFile" 'DEBUG'
+      Log "    â†“ New in GCS: $gcsFile" 'DEBUG'
       # Pull logic
     }
   }
 
-  Log "✓ Bidirectional sync complete" 'SUCCESS'
+  Log "âœ“ Bidirectional sync complete" 'SUCCESS'
 }
 
 # Prune old versions and unused files
@@ -326,7 +326,7 @@ function Prune-Bucket {
           $age = [int]((Get-Date) - [datetime]$version.time_created).TotalDays
 
           if ($age -gt $PruneAgedays) {
-            Log "  🗑  Deleting: $($version.name) (v$($i+1), $age days old, $($version.size) bytes)" 'DEBUG'
+            Log "  ðŸ—‘  Deleting: $($version.name) (v$($i+1), $age days old, $($version.size) bytes)" 'DEBUG'
             if (-not $DryRun) {
               & gcloud storage rm "$BucketUrl/$($version.name)#$($version.generation)" 2>&1 | Out-Null
               $deleted++
@@ -337,7 +337,7 @@ function Prune-Bucket {
       }
     }
 
-    Log "✓ Deleted $deleted versions, freed $([Math]::Round($freed/1MB, 2)) MB" 'SUCCESS'
+    Log "âœ“ Deleted $deleted versions, freed $([Math]::Round($freed/1MB, 2)) MB" 'SUCCESS'
   }
   catch {
     Log "Pruning failed: $_" 'ERROR'
@@ -407,3 +407,4 @@ switch ($Direction) {
 }
 
 Log "=== Done ===" 'INFO'
+
