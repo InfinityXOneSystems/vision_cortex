@@ -1,4 +1,6 @@
-node_modules
+﻿# Windows junk
+desktop.ini
+Thumbs.db
 
-# Snyk Security Extension - AI Rules (auto-generated)
-.github/instructions/snyk_rules.instructions.md
+# OneDrive
+*.tmp
