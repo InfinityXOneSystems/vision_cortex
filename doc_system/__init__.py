@@ -26,7 +26,7 @@ Legacy Components (v0.9):
 
 Usage (v1.0 - Recommended):
     from doc_system import get_system
-    
+
     system = get_system(".")
     success, msg = system.index_document("doc1", "Title", "path.md", content)
     success, msg = system.create_roadmap_item("A-1", "A", "Feature", "Desc")
@@ -36,7 +36,7 @@ Usage (v1.0 - Recommended):
 
 Usage (v0.9 - Legacy):
     from doc_system import DocSystemOrchestrator
-    
+
     orchestrator = DocSystemOrchestrator()
     success, doc_id = orchestrator.ingest.ingest_file("document.md")
 """
@@ -47,95 +47,90 @@ __author__ = "Vision Cortex Team"
 
 # v1.0 - New Components
 try:
-    from doc_index import (
-        DocIndexSystem,
-        DocumentType,
-        DocumentStatus,
-        TodoStatus,
-        TodoPriority,
-        IndexedDocument,
-        RoadmapItem,
-        LinkedTodo
-    )
-    from code_validation_agent import (
-        CodeValidationAgent,
-        ValidationResult
-    )
+    from code_validation_agent import CodeValidationAgent, ValidationResult
+    from doc_index import (DocIndexSystem, DocumentStatus, DocumentType,
+                           IndexedDocument, LinkedTodo, RoadmapItem,
+                           TodoPriority, TodoStatus)
     from unified_orchestrator import UnifiedOrchestrator
     from vision_cortex_cli import VisionCortexCLI
-    
+
     _NEW_COMPONENTS_AVAILABLE = True
 except ImportError:
     _NEW_COMPONENTS_AVAILABLE = False
 
 # v0.9 - Legacy Components
 try:
-    from doc_orchestrator import DocSystemOrchestrator
-    from doc_ingest import DocIngestSystem, DocMetadata
-    from doc_transform import DocTransformSystem, TransformConfig
-    from doc_evolve import DocEvolveSystem, DocVersion
     from doc_create import DocCreateSystem, DocTemplate
+    from doc_evolve import DocEvolveSystem, DocVersion
+    from doc_ingest import DocIngestSystem, DocMetadata
+    from doc_orchestrator import DocSystemOrchestrator
     from doc_sync import DocSyncSystem, SyncLocation, SyncRecord
-    from interactive_todo import InteractiveTodoSystem, TodoItem, TodoStatus, TodoPriority
-    
+    from doc_transform import DocTransformSystem, TransformConfig
+    from interactive_todo import (InteractiveTodoSystem, TodoItem,
+                                  TodoPriority, TodoStatus)
+
     _LEGACY_COMPONENTS_AVAILABLE = True
 except ImportError:
     _LEGACY_COMPONENTS_AVAILABLE = False
 
 __all__ = [
     # v1.0 - New
-    'DocIndexSystem',
-    'DocumentType',
-    'DocumentStatus',
-    'TodoStatus',
-    'TodoPriority',
-    'IndexedDocument',
-    'RoadmapItem',
-    'LinkedTodo',
-    'CodeValidationAgent',
-    'ValidationResult',
-    'UnifiedOrchestrator',
-    'VisionCortexCLI',
-    'get_system',
-    'get_cli',
-    
+    "DocIndexSystem",
+    "DocumentType",
+    "DocumentStatus",
+    "TodoStatus",
+    "TodoPriority",
+    "IndexedDocument",
+    "RoadmapItem",
+    "LinkedTodo",
+    "CodeValidationAgent",
+    "ValidationResult",
+    "UnifiedOrchestrator",
+    "VisionCortexCLI",
+    "get_system",
+    "get_cli",
     # v0.9 - Legacy
-    'DocSystemOrchestrator',
-    'DocIngestSystem',
-    'DocTransformSystem',
-    'DocEvolveSystem',
-    'DocCreateSystem',
-    'DocSyncSystem',
-    'InteractiveTodoSystem',
+    "DocSystemOrchestrator",
+    "DocIngestSystem",
+    "DocTransformSystem",
+    "DocEvolveSystem",
+    "DocCreateSystem",
+    "DocSyncSystem",
+    "InteractiveTodoSystem",
 ]
 
 
 def get_system(workspace_root: str = "."):
     """
     Quick start: Get a fully initialized v1.0 system
-    
+
     Usage:
         from doc_system import get_system
         system = get_system(".")
         success, msg = system.index_document(...)
     """
     if not _NEW_COMPONENTS_AVAILABLE:
-        raise ImportError("v1.0 components not available. Check doc_system installation.")
+        raise ImportError(
+            "v1.0 components not available. Check doc_system installation."
+        )
     return UnifiedOrchestrator(workspace_root)
 
 
 def get_cli(workspace_root: str = "."):
     """
     Quick start: Get the interactive CLI
-    
+
     Usage:
         from doc_system import get_cli
         cli = get_cli(".")
         cli.run_interactive()
     """
     if not _NEW_COMPONENTS_AVAILABLE:
-        raise ImportError("v1.0 components not available. Check doc_system installation.")
+        raise ImportError(
+            "v1.0 components not available. Check doc_system installation."
+        )
     return VisionCortexCLI(workspace_root)
+
 
 __doc__ = """
 Vision Cortex Document System
