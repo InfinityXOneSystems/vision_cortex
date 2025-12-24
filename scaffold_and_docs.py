@@ -5,10 +5,10 @@ Scaffolds all repo folders and generates comprehensive enterprise-grade document
 """
 
 import json
-from pathlib import Path
-from typing import Dict, List
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, List
 
 # ============================================================================
 # CONFIGURATION
@@ -43,55 +43,58 @@ REPO_SPECIFICS = {
     "index": {
         "config": [],
         "docs": ["architecture", "api", "deployment", "guides"],
-    }
+    },
 }
 
 # ============================================================================
 # FOLDER SCAFFOLDER
 # ============================================================================
 
+
 class FolderScaffolder:
     """Create complete folder structures"""
-    
+
     @staticmethod
     def scaffold_repo(repo_name: str, repo_path: Path) -> Dict[str, int]:
         """Scaffold complete repo structure"""
         stats = {"dirs_created": 0, "files_created": 0}
-        
+
         # Get repo-specific structure
         structure = CORE_STRUCTURE.copy()
         if repo_name in REPO_SPECIFICS:
             for key, value in REPO_SPECIFICS[repo_name].items():
                 if key in structure:
                     structure[key] = value
-        
+
         # Create directories
         for base_dir, subdirs in structure.items():
             base_path = repo_path / base_dir
             base_path.mkdir(parents=True, exist_ok=True)
             stats["dirs_created"] += 1
-            
+
             for subdir in subdirs:
                 sub_path = base_path / subdir
                 sub_path.mkdir(parents=True, exist_ok=True)
                 stats["dirs_created"] += 1
-                
+
                 # Create __init__.py for Python packages
                 if base_dir == "src":
                     init_file = sub_path / "__init__.py"
                     if not init_file.exists():
                         init_file.write_text('"""Auto-generated module"""\n')
                         stats["files_created"] += 1
-        
+
         return stats
+
 
 # ============================================================================
 # DOCUMENTATION GENERATORS
 # ============================================================================
 
+
 class DocGenerator:
     """Generate enterprise-grade documentation"""
-    
+
     @staticmethod
     def doc_t1_architecture(repo_name: str) -> str:
         """DOC-T1: Architecture Specification"""
@@ -1726,29 +1729,33 @@ gcloud run deploy {repo_name} --source .
 **Version**: 1.0.0
 """
 
+
 # ============================================================================
 # MAIN EXECUTION
 # ============================================================================
+
 
 def main():
     """Execute complete scaffolding and documentation"""
     print("=" * 80)
     print("INFINITY X AI - Folder Scaffolding & Enterprise Documentation")
     print("=" * 80)
-    
+
     scaffolder = FolderScaffolder()
     doc_gen = DocGenerator()
-    
+
     for repo_name in CORE_REPOS:
         repo_path = PROJECT_ROOT / repo_name
-        
+
         print(f"\n[{repo_name}] Scaffolding...")
         repo_path.mkdir(parents=True, exist_ok=True)
         stats = scaffolder.scaffold_repo(repo_name, repo_path)
-        print(f"  Created: {stats['dirs_created']} directories, {stats['files_created']} files")
-        
+        print(
+            f"  Created: {stats['dirs_created']} directories, {stats['files_created']} files"
+        )
+
         print(f"[{repo_name}] Generating documentation...")
-        
+
         # Generate all docs
         docs = {
             "T1_ARCHITECTURE.md": doc_gen.doc_t1_architecture(repo_name),
@@ -1761,19 +1768,20 @@ def main():
             "T8_TROUBLESHOOTING.md": doc_gen.doc_t8_troubleshooting(repo_name),
             "T9_QUICKSTART.md": doc_gen.doc_t9_quickstart(repo_name),
         }
-        
+
         # Write docs
         docs_dir = repo_path / "docs"
         docs_dir.mkdir(exist_ok=True)
-        
+
         for doc_file, content in docs.items():
             doc_path = docs_dir / doc_file
-            doc_path.write_text(content, encoding='utf-8')
+            doc_path.write_text(content, encoding="utf-8")
             print(f"  Generated: {doc_file}")
-    
+
     print("\n" + "=" * 80)
     print("COMPLETE: All folders scaffolded and documentation generated!")
     print("=" * 80)
+
 
 if __name__ == "__main__":
     main()

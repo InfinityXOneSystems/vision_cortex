@@ -8,6 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def run_command(cmd: list, cwd: str = None, description: str = "") -> bool:
     """Execute shell command and return success status"""
     try:
@@ -19,20 +20,23 @@ def run_command(cmd: list, cwd: str = None, description: str = "") -> bool:
         print(f"  ❌ Error: {str(e)}")
         return False
 
+
 def setup_environment():
     """Setup Python environment for Infinity X AI"""
     print("=" * 80)
     print("🚀 INFINITY X AI - PYTHON ENVIRONMENT SETUP")
     print("=" * 80)
-    
+
     project_root = Path(r"C:\Users\JARVIS\OneDrive\Documents")
-    python_exe = r"C:/Users/JARVIS/OneDrive/Documents/docker_llm/.venv/Scripts/python.exe"
-    
+    python_exe = (
+        r"C:/Users/JARVIS/OneDrive/Documents/docker_llm/.venv/Scripts/python.exe"
+    )
+
     # Verify Python installation
     print("\n✅ Verifying Python environment...")
     result = subprocess.run([python_exe, "--version"], capture_output=True, text=True)
     print(f"  Python: {result.stdout.strip()}")
-    
+
     # Install core dependencies globally to venv
     print("\n📦 Installing core dependencies...")
     deps = [
@@ -58,36 +62,47 @@ def setup_environment():
         "pandas>=2.0",
         "pytest-asyncio>=0.21.0",
     ]
-    
+
     for dep in deps:
         cmd = [python_exe, "-m", "pip", "install", dep, "--quiet"]
         subprocess.run(cmd, capture_output=True)
-    
+
     print("  ✅ Core dependencies installed")
-    
+
     # Setup each core repo
     core_repos = ["vision_cortex", "taxonomy", "auto_builder", "index"]
-    
+
     for repo in core_repos:
         repo_path = project_root / repo
         if repo_path.exists():
             print(f"\n📦 Setting up {repo}...")
-            
+
             # Install repo-specific dependencies
             req_file = repo_path / "requirements.txt"
             if req_file.exists():
-                cmd = [python_exe, "-m", "pip", "install", "-r", str(req_file), "--quiet"]
+                cmd = [
+                    python_exe,
+                    "-m",
+                    "pip",
+                    "install",
+                    "-r",
+                    str(req_file),
+                    "--quiet",
+                ]
                 subprocess.run(cmd, capture_output=True)
                 print(f"  ✅ Installed requirements for {repo}")
-    
+
     print("\n" + "=" * 80)
     print("✅ ENVIRONMENT SETUP COMPLETE")
     print("=" * 80)
     print("\nNext steps:")
-    print(f"  1. Run orchestrator: python {project_root / 'vision_cortex' / 'orchestrator_infinity_ai.py'}")
+    print(
+        f"  1. Run orchestrator: python {project_root / 'vision_cortex' / 'orchestrator_infinity_ai.py'}"
+    )
     print("  2. Check logs: vision_cortex/infinity-ai-orchestrator.log")
     print("  3. Review build results in project directories")
     print("")
+
 
 if __name__ == "__main__":
     setup_environment()

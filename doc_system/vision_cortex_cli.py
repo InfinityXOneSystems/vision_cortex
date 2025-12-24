@@ -8,11 +8,12 @@ Version: 1.0.0
 import argparse
 import json
 import sys
-from pathlib import Path
 from datetime import datetime
-from unified_orchestrator import UnifiedOrchestrator
+from pathlib import Path
+
 from auto_sop_agent import AutoSOPAgent
-from sop_validator_refiner import SOPValidator, SOPRefiner
+from sop_validator_refiner import SOPRefiner, SOPValidator
+from unified_orchestrator import UnifiedOrchestrator
 
 
 class VisionCortexCLI:
