@@ -153,27 +153,6 @@ class VisionCortexCLI:
                 print(f"\n❌ Error: {str(e)}")
             
             input("\nPress Enter to continue...")
-                    self._complete_work_item()
-                elif choice == "17":
-                    self._get_work_item_status()
-                elif choice == "18":
-                    self._system_status()
-                elif choice == "19":
-                    self._full_system_report()
-                elif choice == "20":
-                    self._export_report()
-                elif choice == "21":
-                    self._health_check()
-                else:
-                    print("❌ Invalid choice")
-            
-            except KeyboardInterrupt:
-                print("\n\n⚠️  Interrupted by user")
-                break
-            except Exception as e:
-                print(f"\n❌ Error: {str(e)}")
-            
-            input("\nPress Enter to continue...")
     
     def _index_document(self):
         """Index a document"""
