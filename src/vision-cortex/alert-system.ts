@@ -208,15 +208,15 @@ export class CountdownAlertSystem extends EventEmitter {
     const deadlineType = signal.signalType;
 
     if (threshold === 2) {
-      return `🚨 CRITICAL: ${entityName} - ${deadlineType} in ${daysRemaining} days! Last chance to act.`;
+      return `ðŸš¨ CRITICAL: ${entityName} - ${deadlineType} in ${daysRemaining} days! Last chance to act.`;
     }
     if (threshold === 7) {
-      return `⚠️ URGENT: ${entityName} - ${deadlineType} in ${daysRemaining} days. Close imminent.`;
+      return `âš ï¸ URGENT: ${entityName} - ${deadlineType} in ${daysRemaining} days. Close imminent.`;
     }
     if (threshold === 14) {
-      return `📢 ACTION REQUIRED: ${entityName} - ${deadlineType} in ${daysRemaining} days. Initiate contact now.`;
+      return `ðŸ“¢ ACTION REQUIRED: ${entityName} - ${deadlineType} in ${daysRemaining} days. Initiate contact now.`;
     }
-    return `📋 EARLY WARNING: ${entityName} - ${deadlineType} in ${daysRemaining} days. Plan strategy.`;
+    return `ðŸ“‹ EARLY WARNING: ${entityName} - ${deadlineType} in ${daysRemaining} days. Plan strategy.`;
   }
 
   /**

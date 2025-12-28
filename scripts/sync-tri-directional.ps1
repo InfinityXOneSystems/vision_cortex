@@ -33,7 +33,7 @@ param(
   [bool]$Verbose = $false
 )
 
-$LocalRepo = "C:\Users\JARVIS\OneDrive\Documents\Infinity_X_One_Systems\Vision_Cortex"
+$LocalRepo = "C:\AI\repos\vision_cortex"
 $GitHubRepo = "https://github.com/InfinityXOneSystems/vision_cortex.git"
 $DriveFolder = "14Ry-eaPhuyliv7L02KviaYMHmucv1XoC"
 $GCSBucket = "vision-cortex-infinity-x-one"

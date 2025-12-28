@@ -2,8 +2,8 @@
  * Vision Cortex Scoring Engine - Probabilistic deal scoring with timing decay
  *
  * Implements the universal conversion formula from taxonomy:
- * score = (probability-to-win × days-to-win × profit-lift)
- *         × urgency_weight^2 × stress_weight × decay(time)
+ * score = (probability-to-win Ã— days-to-win Ã— profit-lift)
+ *         Ã— urgency_weight^2 Ã— stress_weight Ã— decay(time)
  *
  * Weights (from taxonomy):
  * - Urgency: highest weight (squared in formula)
@@ -74,7 +74,7 @@ export class ScoringEngine extends EventEmitter {
     const urgencyScore = this.calculateWeightedUrgency(signal.triggers);
     const decayFactor = this.calculateDecay(signal.timestamp);
 
-    // Apply formula: P(win) × days × profit × weights × decay
+    // Apply formula: P(win) Ã— days Ã— profit Ã— weights Ã— decay
     const rawScore =
       probabilityToWin *
       Math.log10(daysToWin + 1) * // Log scale for days

@@ -122,7 +122,7 @@ export class EntityResolver extends EventEmitter {
     tokens1: Set<string>,
     tokens2: Set<string>
   ): number {
-    // Jaccard similarity: |A ∩ B| / |A ∪ B|
+    // Jaccard similarity: |A âˆ© B| / |A âˆª B|
     const intersection = new Set(
       Array.from(tokens1).filter((token) => tokens2.has(token))
     );

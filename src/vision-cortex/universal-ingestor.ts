@@ -5,7 +5,7 @@ import { FDAApprovalTracker } from "./crawlers/fda-approval-tracker";
 import { LinkedInTalentTracker } from "./crawlers/linkedin-talent-tracker";
 import { ScoringEngine, type Signal, type ScoredSignal } from "./scoring-engine";
 
-// Industries covered by the Vision Cortex taxonomy (10 industries × 10 niches)
+// Industries covered by the Vision Cortex taxonomy (10 industries Ã— 10 niches)
 type Industry =
   | "commercial_real_estate"
   | "healthcare_mna"
