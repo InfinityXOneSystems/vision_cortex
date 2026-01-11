@@ -17,3 +17,5 @@ CredentialManager/
 
 # ignore local credentials
 .credentials/
+
+node_modules/
